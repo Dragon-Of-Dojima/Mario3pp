@@ -1,27 +1,29 @@
 #include "Game.h"
 #include <iostream>
 
+Game::Game(void): window(nullptr), renderer(nullptr), isRunning(false){}
+
 bool Game::init(){
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
 		return false;
 	}	
-	window = SDL_CreateWindow(
+	this->window = SDL_CreateWindow(
 		"Mario 3++",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		1280, 720,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
 	);
-	if (window == nullptr) {
+	if (this->window == nullptr) {
 		std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return false;
 	}
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == nullptr) {
+	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (this->renderer == nullptr) {
 		std::cerr << "SDL_CreateRenderer failed: " << SDL_GetError() << std::endl;
-		SDL_DestroyWindow(window);
-		window = nullptr;
+		SDL_DestroyWindow(this->window);
+		this->window = nullptr;
 		SDL_Quit();
 		return false;
 	}
@@ -30,22 +32,26 @@ bool Game::init(){
 	
 }
 void Game::run(){
-	isRunning = true;
+	this->isRunning = true;
 
-	while (isRunning) {
+	while (this->isRunning) {
+		const Uint32 frameStart = SDL_GetTicks();
+
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
-				isRunning = false;
+				this->isRunning = false;
 			}
 		}
 
-		SDL_SetRenderDrawColor(renderer, 92, 148, 252, 255);
-		SDL_RenderClear(renderer);
-		SDL_RenderPresent(renderer);
-		if(SDL_GetTicks() - frameTime < MIN_FRAME_TIME) {
-			SDL_Delay(MIN_FRAME_TIME - (SDL_GetTicks () - frameTime));
-		}
-		}
+		SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
+		SDL_RenderClear(this->renderer);
+		SDL_RenderPresent(this->renderer);
+
+		const Uint32 elapsed = SDL_GetTicks() - frameStart;
+		if (elapsed < static_cast<Uint32>(MIN_FRAME_TIME)) {
+			SDL_Delay(static_cast<Uint32>(MIN_FRAME_TIME) - elapsed);
+		} 
+	}
 }
 void Game::handleEvents(){
 
@@ -56,20 +62,15 @@ void Game::update(){
 void Game::render(){
 
 }
-Game::Game(void)
-	: window(nullptr)
-	, renderer(nullptr)
-{
-}
 Game::~Game(void){
-	isRunning = false;
-	if (renderer != nullptr) {
+	this->isRunning = false;
+	if (this->renderer != nullptr) {
 		SDL_DestroyRenderer(renderer);
-		renderer = nullptr;
+		this->renderer = nullptr;
 	}
-	if (window != nullptr) {
+	if (this->window != nullptr) {
 		SDL_DestroyWindow(window);
-		window = nullptr;
+		this->window = nullptr;
 	}
 	SDL_Quit();
 }

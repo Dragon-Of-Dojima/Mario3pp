@@ -6,7 +6,6 @@ class Game{
 		SDL_Window* window;
 		SDL_Renderer* renderer;
 		SDL_Event event;
-		long frameTime;
 		bool isRunning;
 		static const int MIN_FRAME_TIME = 16;
 	public:
