@@ -1,7 +1,9 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game(void): window(nullptr), renderer(nullptr), isRunning(false){}
+Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(432){}
+
+//static enum colorsToIgnore = {"4491be","ff80c0","5edb92"}
 
 bool Game::init(){
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -37,32 +39,52 @@ void Game::run(){
 	while (this->isRunning) {
 		const Uint32 frameStart = SDL_GetTicks();
 
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) {
-				this->isRunning = false;
-			}
+		float dt = 0.f; //seconds since last frame
+		if (this->lastFrameTicks != 0) {
+			dt = (frameStart - this->lastFrameTicks) / 1000.f;
 		}
+		this->lastFrameTicks = frameStart;
 
-		SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
-		SDL_RenderClear(this->renderer);
-		SDL_RenderPresent(this->renderer);
+		this->handleEvents();
+		this->update(dt);
+		this->render();
 
 		const Uint32 elapsed = SDL_GetTicks() - frameStart;
 		if (elapsed < static_cast<Uint32>(MIN_FRAME_TIME)) {
 			SDL_Delay(static_cast<Uint32>(MIN_FRAME_TIME) - elapsed);
-		} 
+		}
 	}
 }
 void Game::handleEvents(){
-
+	while (SDL_PollEvent(&event)) {
+		switch(event.type) {
+			case SDL_QUIT:
+				this->isRunning = false;
+				break;
+			default:
+				break;
+		}
+		//key presses/controller will be here
+		
+	}
 }
-void Game::update(){
-
+void Game::update(float dt){
+	const Uint8* keys = SDL_GetKeyboardState(NULL);
+	float speed = 200.f;
+	if (keys[SDL_SCANCODE_LEFT])  playerX -= speed * dt;
+	if (keys[SDL_SCANCODE_RIGHT]) playerX += speed * dt;
+	if (keys[SDL_SCANCODE_UP])    playerY -= speed * dt;
+	if (keys[SDL_SCANCODE_DOWN])  playerY += speed * dt;
 }
 void Game::render(){
-
+	SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
+	SDL_RenderClear(this->renderer);
+	SDL_Rect player = { (int)playerX, (int)playerY, 48, 144 };
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	SDL_RenderFillRect(renderer, &player);
+	SDL_RenderPresent(this->renderer);
 }
-Game::~Game(void){
+Game::~Game(){
 	this->isRunning = false;
 	if (this->renderer != nullptr) {
 		SDL_DestroyRenderer(renderer);

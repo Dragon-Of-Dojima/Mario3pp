@@ -7,13 +7,16 @@ class Game{
 		SDL_Renderer* renderer;
 		SDL_Event event;
 		bool isRunning;
+		float playerX;
+		float playerY;
+		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;
 	public:
 		bool init();
 		void run();
 		void handleEvents();
-		void update();
+		void update(float dt);
 		void render();
-		Game(void);
-		~Game(void);
+		Game();
+		~Game();
 };
