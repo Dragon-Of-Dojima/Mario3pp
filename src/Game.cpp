@@ -1,7 +1,7 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(432){}
+Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(531.f), texture(nullptr), velocityY(0){}
 
 //static enum colorsToIgnore = {"4491be","ff80c0","5edb92"}
 
@@ -21,6 +21,7 @@ bool Game::init(){
 		SDL_Quit();
 		return false;
 	}
+
 	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (this->renderer == nullptr) {
 		std::cerr << "SDL_CreateRenderer failed: " << SDL_GetError() << std::endl;
@@ -29,6 +30,15 @@ bool Game::init(){
 		SDL_Quit();
 		return false;
 	}
+
+	SDL_Surface* sprite = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStanding.bmp");
+	if (sprite == nullptr) {
+		std::cerr << "SDL_LoadBMP failed: " << SDL_GetError() << std::endl;
+		return false;
+	}
+	SDL_SetColorKey(sprite, SDL_TRUE, SDL_MapRGB(sprite->format, 0x44, 0x91, 0xBE));
+	this->texture = SDL_CreateTextureFromSurface(this->renderer, sprite);
+	SDL_FreeSurface(sprite);
 	return true;
 	
 	
@@ -71,22 +81,31 @@ void Game::handleEvents(){
 void Game::update(float dt){
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	float speed = 200.f;
-	if (keys[SDL_SCANCODE_LEFT])  playerX -= speed * dt;
+	this->velocityY += 800.f * dt;
+	playerY += this->velocityY * dt;
+	if(playerY > this->floorY){
+		playerY = this->floorY;
+		this->velocityY = 0;
+	}
+	if (keys[SDL_SCANCODE_LEFT]) playerX -= speed * dt;
 	if (keys[SDL_SCANCODE_RIGHT]) playerX += speed * dt;
-	if (keys[SDL_SCANCODE_UP])    playerY -= speed * dt;
-	if (keys[SDL_SCANCODE_DOWN])  playerY += speed * dt;
+	if (keys[SDL_SCANCODE_SPACE] && playerY >= this->floorY){
+		this->velocityY = -400.f;
+	} 
+	// if (keys[SDL_SCANCODE_DOWN])  playerY += speed * dt;
 }
 void Game::render(){
 	SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
 	SDL_RenderClear(this->renderer);
-	SDL_Rect player = { (int)playerX, (int)playerY, 48, 144 };
+	SDL_Rect player = { (int)playerX, (int)playerY, 36, 45 };
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(renderer, &player);
+	SDL_RenderCopy(renderer, texture, NULL, &player);
 	SDL_RenderPresent(this->renderer);
 }
 Game::~Game(){
 	this->isRunning = false;
 	if (this->renderer != nullptr) {
+		SDL_DestroyTexture(texture);
 		SDL_DestroyRenderer(renderer);
 		this->renderer = nullptr;
 	}

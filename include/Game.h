@@ -9,6 +9,9 @@ class Game{
 		bool isRunning;
 		float playerX;
 		float playerY;
+		float floorY = 531.f;
+		float velocityY;
+		SDL_Texture* texture;
 		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;
 	public:
