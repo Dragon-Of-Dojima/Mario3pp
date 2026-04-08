@@ -1,7 +1,9 @@
 #include "Game.h"
 #include <iostream>
+#include <vector>
+#include <cmath>
 
-Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(531.f), texture(nullptr), velocityY(0){}
+Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(531.f), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0){}
 
 //static enum colorsToIgnore = {"4491be","ff80c0","5edb92"}
 
@@ -31,14 +33,26 @@ bool Game::init(){
 		return false;
 	}
 
-	SDL_Surface* sprite = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStanding.bmp");
-	if (sprite == nullptr) {
-		std::cerr << "SDL_LoadBMP failed: " << SDL_GetError() << std::endl;
-		return false;
+	SDL_Surface* spriteStand = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStanding.bmp");
+	SDL_Surface* spriteStep = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStep.bmp");
+	SDL_Surface* spriteJump = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioJump.bmp");
+	std::vector<SDL_Surface*> sprites = {spriteStand,spriteStep,spriteJump};
+	for(SDL_Surface* sprite : sprites){
+		if (sprite == nullptr) {
+			std::cerr << "SDL_LoadBMP failed: " << SDL_GetError() << std::endl;
+			return false;
+		}
 	}
-	SDL_SetColorKey(sprite, SDL_TRUE, SDL_MapRGB(sprite->format, 0x44, 0x91, 0xBE));
-	this->texture = SDL_CreateTextureFromSurface(this->renderer, sprite);
-	SDL_FreeSurface(sprite);
+	SDL_SetColorKey(spriteStand, SDL_TRUE, SDL_MapRGB(spriteStand->format, 0xFF, 0x80, 0xC0));
+	SDL_SetColorKey(spriteStep, SDL_TRUE, SDL_MapRGB(spriteStep->format, 0xFF, 0x80, 0xC0));
+	SDL_SetColorKey(spriteJump, SDL_TRUE, SDL_MapRGB(spriteJump->format, 0xFF, 0x80, 0xC0));
+	this->texStand = SDL_CreateTextureFromSurface(this->renderer, spriteStand);
+	this->texStep = SDL_CreateTextureFromSurface(this->renderer, spriteStep);
+	this->texJump = SDL_CreateTextureFromSurface(this->renderer, spriteJump);
+	
+	SDL_FreeSurface(spriteStand);
+	SDL_FreeSurface(spriteStep);
+	SDL_FreeSurface(spriteJump);
 	return true;
 	
 	
@@ -79,6 +93,7 @@ void Game::handleEvents(){
 	}
 }
 void Game::update(float dt){
+	//this->animTimer = 0.f;
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	float speed = 200.f;
 	this->velocityY += 800.f * dt;
@@ -87,11 +102,20 @@ void Game::update(float dt){
 		playerY = this->floorY;
 		this->velocityY = 0;
 	}
-	if (keys[SDL_SCANCODE_LEFT]) playerX -= speed * dt;
-	if (keys[SDL_SCANCODE_RIGHT]) playerX += speed * dt;
+	if (keys[SDL_SCANCODE_LEFT]){
+		playerX -= speed * dt;
+		this->animTimer += dt;
+	}
+	if (keys[SDL_SCANCODE_RIGHT]){
+		playerX += speed * dt;
+		this->animTimer += dt;
+	} 
 	if (keys[SDL_SCANCODE_SPACE] && playerY >= this->floorY){
 		this->velocityY = -400.f;
-	} 
+	}
+	if (!keys[SDL_SCANCODE_LEFT] && !keys[SDL_SCANCODE_RIGHT]) {
+		this->animTimer = 0.f;
+	 } 
 	// if (keys[SDL_SCANCODE_DOWN])  playerY += speed * dt;
 }
 void Game::render(){
@@ -99,13 +123,25 @@ void Game::render(){
 	SDL_RenderClear(this->renderer);
 	SDL_Rect player = { (int)playerX, (int)playerY, 36, 45 };
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderCopy(renderer, texture, NULL, &player);
+	SDL_Texture* currentTex = this->texStand;
+	bool useStepSprite = fmod(animTimer, 0.3f) > 0.15f;
+	if(useStepSprite){
+		currentTex = this->texStep;
+	}
+	if (playerY < floorY) {
+		currentTex = this->texJump;
+	}
+	
+
+	SDL_RenderCopy(renderer, currentTex, NULL, &player);
 	SDL_RenderPresent(this->renderer);
 }
 Game::~Game(){
 	this->isRunning = false;
 	if (this->renderer != nullptr) {
-		SDL_DestroyTexture(texture);
+		SDL_DestroyTexture(texJump);
+		SDL_DestroyTexture(texStand);
+		SDL_DestroyTexture(texStep);
 		SDL_DestroyRenderer(renderer);
 		this->renderer = nullptr;
 	}

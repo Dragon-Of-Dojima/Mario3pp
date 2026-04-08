@@ -11,7 +11,10 @@ class Game{
 		float playerY;
 		float floorY = 531.f;
 		float velocityY;
-		SDL_Texture* texture;
+		SDL_Texture* texStand;
+		SDL_Texture* texStep;
+		SDL_Texture* texJump;
+		float animTimer;
 		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;
 	public:
