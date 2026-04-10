@@ -14,6 +14,8 @@ class Game{
 		SDL_Texture* texStand;
 		SDL_Texture* texStep;
 		SDL_Texture* texJump;
+		bool isFacingLeft;
+		int standW, standH, stepW, stepH, jumpW, jumpH;
 		float animTimer;
 		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;

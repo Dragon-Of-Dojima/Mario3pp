@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 
-Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(531.f), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0){}
+Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(531.f), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0),isFacingLeft(false){}
 
 //static enum colorsToIgnore = {"4491be","ff80c0","5edb92"}
 
@@ -95,7 +95,7 @@ void Game::handleEvents(){
 void Game::update(float dt){
 	//this->animTimer = 0.f;
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
-	float speed = 200.f;
+	float speed = 300.f;
 	this->velocityY += 800.f * dt;
 	playerY += this->velocityY * dt;
 	if(playerY > this->floorY){
@@ -103,10 +103,16 @@ void Game::update(float dt){
 		this->velocityY = 0;
 	}
 	if (keys[SDL_SCANCODE_LEFT]){
+		if(this->isFacingLeft == false){
+			this->isFacingLeft = true;
+		}
 		playerX -= speed * dt;
 		this->animTimer += dt;
 	}
 	if (keys[SDL_SCANCODE_RIGHT]){
+		if(this->isFacingLeft == true){
+			this->isFacingLeft = false;
+		}
 		playerX += speed * dt;
 		this->animTimer += dt;
 	} 
@@ -121,19 +127,31 @@ void Game::update(float dt){
 void Game::render(){
 	SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
 	SDL_RenderClear(this->renderer);
-	SDL_Rect player = { (int)playerX, (int)playerY, 36, 45 };
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	int standW, standH, stepW, stepH, jumpW, jumpH;
+	SDL_QueryTexture(texStand, NULL, NULL, &standW, &standH);
+	SDL_QueryTexture(texStep, NULL, NULL, &stepW, &stepH);
+	SDL_QueryTexture(texJump, NULL, NULL, &jumpW, &jumpH);
+	int drawW = standW * 3;
+	int drawH = standH * 3;
 	SDL_Texture* currentTex = this->texStand;
 	bool useStepSprite = fmod(animTimer, 0.3f) > 0.15f;
+	
 	if(useStepSprite){
 		currentTex = this->texStep;
+		drawW = stepW * 3;
+		drawH = stepH * 3;
 	}
 	if (playerY < floorY) {
 		currentTex = this->texJump;
+		drawW = jumpW * 3;
+		drawH = jumpH * 3;
 	}
-	
+	SDL_Rect player = { (int)playerX, (int)playerY, drawW, drawH };
 
-	SDL_RenderCopy(renderer, currentTex, NULL, &player);
+
+	SDL_RendererFlip flip = isFacingLeft ?  SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	SDL_RenderCopyEx(renderer, currentTex, NULL, &player, 0.0, NULL, flip);
 	SDL_RenderPresent(this->renderer);
 }
 Game::~Game(){
