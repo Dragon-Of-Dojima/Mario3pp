@@ -3,9 +3,11 @@
 #include <vector>
 #include <cmath>
 
-Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(531.f), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0),isFacingLeft(false){}
+Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(0), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0),isFacingLeft(false){
+	for(int i = 0; i < 90; i++) tileTextures[i] = nullptr;
+}
 
-//static enum colorsToIgnore = {"4491be","ff80c0","5edb92"}
+//static enum colorsToIgnore = {"ff80c0"}
 
 bool Game::init(){
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -33,6 +35,29 @@ bool Game::init(){
 		return false;
 	}
 
+	level.level_1_1();
+
+	static const char* tileFiles[90] = {};
+	tileFiles[STONE_LEFT]        = "public/images/tiles/mainTileLeftEdge.bmp";
+	tileFiles[STONE_INNER]       = "public/images/tiles/mainTileInner.bmp";
+	tileFiles[STONE_RIGHT]       = "public/images/tiles/mainTileRightEdge.bmp";
+	tileFiles[STONE_LEFT_RISER]  = "public/images/tiles/mainTileLeftSide.bmp";
+	tileFiles[STONE_INNER_RISER] = "public/images/tiles/mainTileCenterNotTop.bmp";
+	tileFiles[STONE_RIGHT_RISER] = "public/images/tiles/mainTileRightSide.bmp";
+	tileFiles[PATTERN_BLOCK] = "public/images/tiles/patternBoxReg.bmp";
+
+	for(int i = 0; i < 90; i++){
+		if(tileFiles[i] == nullptr) continue;
+		SDL_Surface* surf = SDL_LoadBMP(tileFiles[i]);
+		if(surf == nullptr){
+			std::cerr << "Failed to load tile " << i << ": " << SDL_GetError() << std::endl;
+			continue;
+		}
+		SDL_SetColorKey(surf, SDL_TRUE, SDL_MapRGB(surf->format, 0xFF, 0x80, 0xC0));
+		tileTextures[i] = SDL_CreateTextureFromSurface(renderer, surf);
+		SDL_FreeSurface(surf);
+	}
+
 	SDL_Surface* spriteStand = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStanding.bmp");
 	SDL_Surface* spriteStep = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStep.bmp");
 	SDL_Surface* spriteJump = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioJump.bmp");
@@ -53,6 +78,12 @@ bool Game::init(){
 	SDL_FreeSurface(spriteStand);
 	SDL_FreeSurface(spriteStep);
 	SDL_FreeSurface(spriteJump);
+
+	int sh; //standing height of sprite
+	SDL_QueryTexture(texStand, NULL, NULL, NULL, &sh);
+	this->floorY = (720.f - TILE_SIZE) - sh;
+	this->playerY = this->floorY;
+
 	return true;
 	
 	
@@ -95,7 +126,7 @@ void Game::handleEvents(){
 void Game::update(float dt){
 	//this->animTimer = 0.f;
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
-	float speed = 300.f;
+	float speed = 400.f;
 	this->velocityY += 800.f * dt;
 	playerY += this->velocityY * dt;
 	if(playerY > this->floorY){
@@ -127,25 +158,36 @@ void Game::update(float dt){
 void Game::render(){
 	SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
 	SDL_RenderClear(this->renderer);
+
+	const auto& tiles = level.getTiles();
+	for(int row = 0; row < (int)tiles.size(); row++){
+		for(int col = 0; col < (int)tiles[row].size(); col++){
+			int id = tiles[row][col];
+			if(id == BLUESKY || tileTextures[id] == nullptr) continue;
+			SDL_Rect dst = { col * TILE_SIZE, 720 - TILE_SIZE * (row + 1), TILE_SIZE, TILE_SIZE };
+			SDL_RenderCopy(renderer, tileTextures[id], NULL, &dst);
+		}
+	}
+
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	int standW, standH, stepW, stepH, jumpW, jumpH;
 	SDL_QueryTexture(texStand, NULL, NULL, &standW, &standH);
 	SDL_QueryTexture(texStep, NULL, NULL, &stepW, &stepH);
 	SDL_QueryTexture(texJump, NULL, NULL, &jumpW, &jumpH);
-	int drawW = standW * 3;
-	int drawH = standH * 3;
+	int drawW = standW;
+	int drawH = standH;
 	SDL_Texture* currentTex = this->texStand;
 	bool useStepSprite = fmod(animTimer, 0.3f) > 0.15f;
 	
 	if(useStepSprite){
 		currentTex = this->texStep;
-		drawW = stepW * 3;
-		drawH = stepH * 3;
+		drawW = stepW;
+		drawH = stepH;
 	}
 	if (playerY < floorY) {
 		currentTex = this->texJump;
-		drawW = jumpW * 3;
-		drawH = jumpH * 3;
+		drawW = jumpW;
+		drawH = jumpH;
 	}
 	SDL_Rect player = { (int)playerX, (int)playerY, drawW, drawH };
 
@@ -157,6 +199,9 @@ void Game::render(){
 Game::~Game(){
 	this->isRunning = false;
 	if (this->renderer != nullptr) {
+		for(int i = 0; i < 90; i++){
+			if(tileTextures[i] != nullptr) SDL_DestroyTexture(tileTextures[i]);
+		}
 		SDL_DestroyTexture(texJump);
 		SDL_DestroyTexture(texStand);
 		SDL_DestroyTexture(texStep);

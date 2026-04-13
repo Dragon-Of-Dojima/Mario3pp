@@ -1,5 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include "Level.h"
+#include "Tiles.h"
 
 class Game{
 	private:
@@ -9,7 +11,7 @@ class Game{
 		bool isRunning;
 		float playerX;
 		float playerY;
-		float floorY = 531.f;
+		float floorY;
 		float velocityY;
 		SDL_Texture* texStand;
 		SDL_Texture* texStep;
@@ -19,6 +21,9 @@ class Game{
 		float animTimer;
 		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;
+		static const int TILE_SIZE = 16;
+		Level level;
+		SDL_Texture* tileTextures[90];
 	public:
 		bool init();
 		void run();
