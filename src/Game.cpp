@@ -45,6 +45,13 @@ bool Game::init(){
 	tileFiles[STONE_INNER_RISER] = "public/images/tiles/mainTileCenterNotTop.bmp";
 	tileFiles[STONE_RIGHT_RISER] = "public/images/tiles/mainTileRightSide.bmp";
 	tileFiles[PATTERN_BLOCK] = "public/images/tiles/patternBoxReg.bmp";
+	tileFiles[CHECKERBUSH_INNER] = "public/images/tiles/checkerBushInner.bmp";
+	tileFiles[CHECKERBUSH_LEFT_EDGE] = "public/images/tiles/checkerBushLeftEdge.bmp";
+	tileFiles[CHECKERBUSH_RIGHT_EDGE] = "public/images/tiles/checkerBushRightEdge.bmp";
+	tileFiles[CHECKERBUSH_TOP_LEFT] = "public/images/tiles/checkerBushTopLeft.bmp";
+	tileFiles[CHECKERBUSH_TOP_RIGHT] = "public/images/tiles/checkerBushTopRight.bmp";
+	tileFiles[CHECKERBUSH_TOP_LEFT_WITH_BEHIND] = "public/images/tiles/checkerBushTopLeftWithBehind.bmp";
+	tileFiles[CHECKERBUSH_TOP_RIGHT_WITH_BEHIND] = "public/images/tiles/checkerBushTopRightWithBehind.bmp";
 
 	for(int i = 0; i < 90; i++){
 		if(tileFiles[i] == nullptr) continue;
@@ -156,10 +163,10 @@ void Game::update(float dt){
 	// if (keys[SDL_SCANCODE_DOWN])  playerY += speed * dt;
 }
 void Game::render(){
-	SDL_SetRenderDrawColor(this->renderer, 92, 148, 252, 255);
+	SDL_SetRenderDrawColor(this->renderer, 0xAF, 0xF9, 0xF0, 0xFF);
 	SDL_RenderClear(this->renderer);
 
-	const auto& tiles = level.getTiles();
+	const std::vector<std::vector<int>>& tiles = level.getTiles();
 	for(int row = 0; row < (int)tiles.size(); row++){
 		for(int col = 0; col < (int)tiles[row].size(); col++){
 			int id = tiles[row][col];
