@@ -4,7 +4,9 @@
 #include <cmath>
 
 Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(0), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0),isFacingLeft(false){
-	for(int i = 0; i < 90; i++) tileTextures[i] = nullptr;
+	for(int i = 0; i < TILE_COUNT; i++){
+		tileTextures[i] = nullptr;
+	} 
 }
 
 //static enum colorsToIgnore = {"ff80c0"}
@@ -37,7 +39,7 @@ bool Game::init(){
 
 	level.level_1_1();
 
-	static const char* tileFiles[90] = {};
+	static const char* tileFiles[TILE_COUNT] = {};
 	tileFiles[STONE_LEFT]        = "public/images/tiles/mainTileLeftEdge.bmp";
 	tileFiles[STONE_INNER]       = "public/images/tiles/mainTileInner.bmp";
 	tileFiles[STONE_RIGHT]       = "public/images/tiles/mainTileRightEdge.bmp";
@@ -52,8 +54,58 @@ bool Game::init(){
 	tileFiles[CHECKERBUSH_TOP_RIGHT] = "public/images/tiles/checkerBushTopRight.bmp";
 	tileFiles[CHECKERBUSH_TOP_LEFT_WITH_BEHIND] = "public/images/tiles/checkerBushTopLeftWithBehind.bmp";
 	tileFiles[CHECKERBUSH_TOP_RIGHT_WITH_BEHIND] = "public/images/tiles/checkerBushTopRightWithBehind.bmp";
+	tileFiles[BUSH_ALONE] = "public/images/tiles/smallBushSingleton.bmp";
+	tileFiles[QUESTION_BLOCK_1] = "public/images/tiles/itemBlock1.bmp";
+	tileFiles[PINK_PLATFORM_LEFT_TOP_CORNER]     = "public/images/tiles/pinkPlatformLeftTopCorner.bmp";
+	tileFiles[PINK_PLATFORM_LEFT_EDGE]           = "public/images/tiles/pinkPlatformLeftEdge.bmp";
+	tileFiles[PINK_PLATFORM_LEFT_BOTTOM_CORNER]  = "public/images/tiles/pinkPlatformLeftBottomCorner.bmp";
+	tileFiles[PINK_PLATFORM_TOP_INNER]           = "public/images/tiles/pinkPlatformTopInner.bmp";
+	tileFiles[PINK_PLATFORM_INNER]               = "public/images/tiles/pinkPlatformInner.bmp";
+	tileFiles[PINK_PLATFORM_BOTTOM_INNER]        = "public/images/tiles/pinkPlatformBottomInner.bmp";
+	tileFiles[PINK_PLATFORM_RIGHT_TOP_CORNER]    = "public/images/tiles/pinkPlatformRightTopCorner.bmp";
+	tileFiles[PINK_PLATFORM_RIGHT_EDGE]          = "public/images/tiles/pinkPlatformRightEdge.bmp";
+	tileFiles[PINK_PLATFORM_RIGHT_BOTTOM_CORNER] = "public/images/tiles/pinkPlatformRightBottomCorner.bmp";
+	tileFiles[PINK_PLATFORM_SHADOW_TOP]          = "public/images/tiles/pinkPlatformShadowTop.bmp";
+	tileFiles[PINK_PLATFORM_SHADOW_EDGE]         = "public/images/tiles/pinkPlatformShadowEdge.bmp";
+	tileFiles[PINK_PLATFORM_SHADOW_BOTTOM]       = "public/images/tiles/pinkPlatformShadowBottom.bmp";
+	tileFiles[BLUE_PLATFORM_LEFT_TOP_CORNER]     = "public/images/tiles/bluePlatformLeftTopCorner.bmp";
+	tileFiles[BLUE_PLATFORM_LEFT_EDGE]           = "public/images/tiles/bluePlatformLeftEdge.bmp";
+	tileFiles[BLUE_PLATFORM_LEFT_BOTTOM_CORNER]  = "public/images/tiles/bluePlatformLeftBottomCorner.bmp";
+	tileFiles[BLUE_PLATFORM_TOP_INNER]           = "public/images/tiles/bluePlatformTopInner.bmp";
+	tileFiles[BLUE_PLATFORM_INNER]               = "public/images/tiles/bluePlatformInner.bmp";
+	tileFiles[BLUE_PLATFORM_BOTTOM_INNER]        = "public/images/tiles/bluePlatformBottomInner.bmp";
+	tileFiles[BLUE_PLATFORM_RIGHT_TOP_CORNER]    = "public/images/tiles/bluePlatformRightTopCorner.bmp";
+	tileFiles[BLUE_PLATFORM_RIGHT_EDGE]          = "public/images/tiles/bluePlatformRightEdge.bmp";
+	tileFiles[BLUE_PLATFORM_RIGHT_BOTTOM_CORNER] = "public/images/tiles/bluePlatformRightBottomCorner.bmp";
+	tileFiles[BLUE_PLATFORM_SHADOW_TOP]          = "public/images/tiles/bluePlatformShadowTop.bmp";
+	tileFiles[BLUE_PLATFORM_SHADOW_EDGE]         = "public/images/tiles/bluePlatformShadowEdge.bmp";
+	tileFiles[BLUE_PLATFORM_SHADOW_BOTTOM]       = "public/images/tiles/bluePlatformShadowBottom.bmp";
+	tileFiles[GREEN_PLATFORM_LEFT_TOP_CORNER]     = "public/images/tiles/greenPlatformLeftTopCorner.bmp";
+	tileFiles[GREEN_PLATFORM_LEFT_EDGE]           = "public/images/tiles/greenPlatformLeftEdge.bmp";
+	tileFiles[GREEN_PLATFORM_LEFT_BOTTOM_CORNER]  = "public/images/tiles/greenPlatformLeftBottomCorner.bmp";
+	tileFiles[GREEN_PLATFORM_TOP_INNER]           = "public/images/tiles/greenPlatformTopInner.bmp";
+	tileFiles[GREEN_PLATFORM_INNER]               = "public/images/tiles/greenPlatformInner.bmp";
+	tileFiles[GREEN_PLATFORM_BOTTOM_INNER]        = "public/images/tiles/greenPlatformBottomInner.bmp";
+	tileFiles[GREEN_PLATFORM_RIGHT_TOP_CORNER]    = "public/images/tiles/greenPlatformRightTopCorner.bmp";
+	tileFiles[GREEN_PLATFORM_RIGHT_EDGE]          = "public/images/tiles/greenPlatformRightEdge.bmp";
+	tileFiles[GREEN_PLATFORM_RIGHT_BOTTOM_CORNER] = "public/images/tiles/greenPlatformRightBottomCorner.bmp";
+	tileFiles[GREEN_PLATFORM_SHADOW_TOP]          = "public/images/tiles/greenPlatformShadowTop.bmp";
+	tileFiles[GREEN_PLATFORM_SHADOW_EDGE]         = "public/images/tiles/greenPlatformShadowEdge.bmp";
+	tileFiles[GREEN_PLATFORM_SHADOW_BOTTOM]       = "public/images/tiles/greenPlatformShadowBottom.bmp";
+	tileFiles[WHITE_PLATFORM_LEFT_TOP_CORNER]     = "public/images/tiles/whitePlatformLeftTopCorner.bmp";
+	tileFiles[WHITE_PLATFORM_LEFT_EDGE]           = "public/images/tiles/whitePlatformLeftEdge.bmp";
+	tileFiles[WHITE_PLATFORM_LEFT_BOTTOM_CORNER]  = "public/images/tiles/whitePlatformLeftBottomCorner.bmp";
+	tileFiles[WHITE_PLATFORM_TOP_INNER]           = "public/images/tiles/whitePlatformTopInner.bmp";
+	tileFiles[WHITE_PLATFORM_INNER]               = "public/images/tiles/whitePlatformInner.bmp";
+	tileFiles[WHITE_PLATFORM_BOTTOM_INNER]        = "public/images/tiles/whitePlatformBottomInner.bmp";
+	tileFiles[WHITE_PLATFORM_RIGHT_TOP_CORNER]    = "public/images/tiles/whitePlatformRightTopCorner.bmp";
+	tileFiles[WHITE_PLATFORM_RIGHT_EDGE]          = "public/images/tiles/whitePlatformRightEdge.bmp";
+	tileFiles[WHITE_PLATFORM_RIGHT_BOTTOM_CORNER] = "public/images/tiles/whitePlatformRightBottomCorner.bmp";
+	tileFiles[WHITE_PLATFORM_SHADOW_TOP]          = "public/images/tiles/whitePlatformShadowTop.bmp";
+	tileFiles[WHITE_PLATFORM_SHADOW_EDGE]         = "public/images/tiles/whitePlatformShadowEdge.bmp";
+	tileFiles[WHITE_PLATFORM_SHADOW_BOTTOM]       = "public/images/tiles/whitePlatformShadowBottom.bmp";
 
-	for(int i = 0; i < 90; i++){
+	for(int i = 0; i < TILE_COUNT; i++){
 		if(tileFiles[i] == nullptr) continue;
 		SDL_Surface* surf = SDL_LoadBMP(tileFiles[i]);
 		if(surf == nullptr){
@@ -206,7 +258,7 @@ void Game::render(){
 Game::~Game(){
 	this->isRunning = false;
 	if (this->renderer != nullptr) {
-		for(int i = 0; i < 90; i++){
+		for(int i = 0; i < TILE_COUNT; i++){
 			if(tileTextures[i] != nullptr) SDL_DestroyTexture(tileTextures[i]);
 		}
 		SDL_DestroyTexture(texJump);

@@ -5,16 +5,29 @@
 #include "Tiles.h"
 #include <algorithm>
 
+// Tile ID legend (see Tiles.h). Re-sync these numbers if the enum is reordered.
+//   0 = BLUESKY
+//   8 = PIPE_TOP_LEFT                      9 = PIPE_TOP_RIGHT
+//  10 = PIPE_LEFT_EDGE                    11 = PIPE_RIGHT_EDGE
+//  95 = CHECKERBUSH_LEFT_EDGE             96 = CHECKERBUSH_RIGHT_EDGE
+//  97 = CHECKERBUSH_INNER
+//  98 = CHECKERBUSH_TOP_LEFT_WITH_BEHIND  99 = CHECKERBUSH_TOP_RIGHT_WITH_BEHIND
+// 100 = CHECKERBUSH_TOP_LEFT             101 = CHECKERBUSH_TOP_RIGHT
 std::vector<std::vector<int>> bushSetOne = {
-	{83,85,85,85,84},
-	{83,86,87,85,84},
-	{88,87,84,88,89},
-	{0,88,89,0,0}
+	{95,97,97,97,96},
+	{95,98,99,97,96},
+	{100,99,96,100,101},
+	{0,100,101,0,0}
 };
-std::vector<std::vector<int>> bushSetTwo = { //[0][0] is 89 when standalone
-	{86,87,85,84},
-	{0,83,86,89},
-	{0,88,89,0}
+std::vector<std::vector<int>> bushSetTwo = { //[0][0] is 101 when standalone
+	{98,99,97,96},
+	{0,95,98,101},
+	{0,100,101,0}
+};
+std::vector<std::vector<int>> bushSetTwoHalf = { //[0][0] is 101 when standalone
+	{101,99,97,96},
+	{0,95,98,101},
+	{0,100,101,0}
 };
 std::vector<std::vector<int>> smallestPossiblePipe = {
 	{10,11},
@@ -61,11 +74,17 @@ void Level::buildGround(int X, int Y, int gWidth, int gHeight) {
 		}
 	}
 }
+void Level::placeSingleTileObject(Tiles t, int Xpos, int Ypos){ //passing a pointer for T would be bigger bc an int is 4B, pointer 8B
+	levelTiles[Ypos][Xpos] = t;
+}
+void Level::buildScrewPlatform(string color, int tilesXAxisBtwn, int tilesYAxisBtwn, int Xpos, int Ypos){
+	
+}
 void Level::level_1_1(){
 	static int LEVEL1_1_WIDTH = 176;
 	static int LEVEL1_1_HEIGHT = 27;
 	levelTiles.assign(LEVEL1_1_HEIGHT, std::vector<int>(LEVEL1_1_WIDTH, BLUESKY));
-	buildGround(0, 0, 29, 1);
+	buildGround(0, 0, 39, 1);
 	buildGround(29, 0, 29, 2);
 	for(int row = 0; row < bushSetOne.size(); row++){
 		for(int col = 0; col < bushSetOne[row].size(); col++){
@@ -77,7 +96,13 @@ void Level::level_1_1(){
 			if(bushSetTwo[r][c] != BLUESKY) levelTiles[1 + r][5 + c] = bushSetTwo[r][c];
 		}
 	}
-
+	placeSingleTileObject(BUSH_ALONE,10,1);
+	placeSingleTileObject(BUSH_ALONE,11,1);
+	placeSingleTileObject(BUSH_ALONE,12,1);
+	placeSingleTileObject(QUESTION_BLOCK_1,11,4);
+	placeSingleTileObject(QUESTION_BLOCK_1,12,4);
+	placeSingleTileObject(QUESTION_BLOCK_1,14,7);
+	placeSingleTileObject(QUESTION_BLOCK_1,15,7);
 }
 //below is what Jakowski uses for the triangles of blocks. bDir is true for acuse, false for obtuse.
 //X is where on map it starts, y is where on Y axis it starts, 4 is height in tiles at end 

@@ -23,7 +23,7 @@ class Game{
 		static const int MIN_FRAME_TIME = 16;
 		static const int TILE_SIZE = 16;
 		Level level;
-		SDL_Texture* tileTextures[90];
+		SDL_Texture* tileTextures[TILE_COUNT]; //if I used a scoped enum (meaning it was also a class), the TC would need Tiles::
 	public:
 		bool init();
 		void run();
