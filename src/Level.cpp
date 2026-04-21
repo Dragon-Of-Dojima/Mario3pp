@@ -4,6 +4,7 @@
 #include "Level.h"
 #include "Tiles.h"
 #include <algorithm>
+#include <iostream>
 
 // Tile ID legend (see Tiles.h). Re-sync these numbers if the enum is reordered.
 //   0 = BLUESKY
@@ -77,8 +78,121 @@ void Level::buildGround(int X, int Y, int gWidth, int gHeight) {
 void Level::placeSingleTileObject(Tiles t, int Xpos, int Ypos){ //passing a pointer for T would be bigger bc an int is 4B, pointer 8B
 	levelTiles[Ypos][Xpos] = t;
 }
-void Level::buildScrewPlatform(string color, int tilesXAxisBtwn, int tilesYAxisBtwn, int Xpos, int Ypos){
+std::vector<std::vector<int>> Level::buildScrewPlatform(std::string color, int tilesXAxisBtwn, int tilesYAxisBtwn){
 	
+	// int tilesToUse[] = {}; bad bc you can't reassign a raw C array in C++
+	std::vector<int> tilesToUse = {};
+	// Row-major to match levelTiles: outer = Y (rows), inner = X (cols).
+	std::vector<std::vector<int>> platformMatrix(tilesYAxisBtwn + 2, std::vector<int>(tilesXAxisBtwn + 2,-1));
+	if(color == "PINK"){
+		tilesToUse = {
+			PINK_PLATFORM_LEFT_TOP_CORNER,    PINK_PLATFORM_TOP_INNER,       PINK_PLATFORM_RIGHT_TOP_CORNER,
+			PINK_PLATFORM_LEFT_EDGE,          PINK_PLATFORM_INNER,           PINK_PLATFORM_RIGHT_EDGE,
+			PINK_PLATFORM_LEFT_BOTTOM_CORNER, PINK_PLATFORM_BOTTOM_INNER,    PINK_PLATFORM_RIGHT_BOTTOM_CORNER,
+			PINK_PLATFORM_SHADOW_TOP,         PINK_PLATFORM_SHADOW_EDGE,     PINK_PLATFORM_SHADOW_BOTTOM
+		};
+	}else if(color == "BLUE"){
+		tilesToUse = {
+			BLUE_PLATFORM_LEFT_TOP_CORNER,    BLUE_PLATFORM_TOP_INNER,       BLUE_PLATFORM_RIGHT_TOP_CORNER,
+			BLUE_PLATFORM_LEFT_EDGE,          BLUE_PLATFORM_INNER,           BLUE_PLATFORM_RIGHT_EDGE,
+			BLUE_PLATFORM_LEFT_BOTTOM_CORNER, BLUE_PLATFORM_BOTTOM_INNER,    BLUE_PLATFORM_RIGHT_BOTTOM_CORNER,
+			BLUE_PLATFORM_SHADOW_TOP,         BLUE_PLATFORM_SHADOW_EDGE,     BLUE_PLATFORM_SHADOW_BOTTOM
+		};
+	}else if(color == "WHITE"){
+		tilesToUse = {
+			WHITE_PLATFORM_LEFT_TOP_CORNER,    WHITE_PLATFORM_TOP_INNER,      WHITE_PLATFORM_RIGHT_TOP_CORNER,
+			WHITE_PLATFORM_LEFT_EDGE,          WHITE_PLATFORM_INNER,          WHITE_PLATFORM_RIGHT_EDGE,
+			WHITE_PLATFORM_LEFT_BOTTOM_CORNER, WHITE_PLATFORM_BOTTOM_INNER,   WHITE_PLATFORM_RIGHT_BOTTOM_CORNER,
+			WHITE_PLATFORM_SHADOW_TOP,         WHITE_PLATFORM_SHADOW_EDGE,    WHITE_PLATFORM_SHADOW_BOTTOM
+		};
+	}else{
+		tilesToUse = {
+			GREEN_PLATFORM_LEFT_TOP_CORNER,    GREEN_PLATFORM_TOP_INNER,      GREEN_PLATFORM_RIGHT_TOP_CORNER,
+			GREEN_PLATFORM_LEFT_EDGE,          GREEN_PLATFORM_INNER,          GREEN_PLATFORM_RIGHT_EDGE,
+			GREEN_PLATFORM_LEFT_BOTTOM_CORNER, GREEN_PLATFORM_BOTTOM_INNER,   GREEN_PLATFORM_RIGHT_BOTTOM_CORNER,
+			GREEN_PLATFORM_SHADOW_TOP,         GREEN_PLATFORM_SHADOW_EDGE,    GREEN_PLATFORM_SHADOW_BOTTOM
+		};
+	}
+	// i = X (column), j = Y (row). platformMatrix is [row][col] == [j][i].
+	for(int j = 0; j < platformMatrix.size(); j++){           // rows (Y)
+		for(int i = 0; i < platformMatrix[0].size(); i++){    // cols (X)
+			if(j == 0){ //bottom row
+				if(i == 0){ //left corner
+					platformMatrix[j][i] = tilesToUse[6];
+				}else if(i == platformMatrix[0].size() - 1){ //right corner
+					platformMatrix[j][i] = tilesToUse[8];
+				}
+				else{
+					if(tilesXAxisBtwn > 0){
+						platformMatrix[j][i] = tilesToUse[7];
+					}
+				}
+			}
+			else if(j < platformMatrix.size() - 1){
+				//middle rows (if any)
+					if(i == 0){ //left edge
+						platformMatrix[j][i] = tilesToUse[3];
+					}
+					else if(i == platformMatrix[0].size() - 1){// right edge
+						platformMatrix[j][i] = tilesToUse[5];
+					}else{
+						if(tilesXAxisBtwn > 0){
+							platformMatrix[j][i] = tilesToUse[4];
+						}
+				}
+			}
+			else if(j == platformMatrix.size() - 1){ //top row
+				if(i == 0){ //left corner
+					platformMatrix[j][i] = tilesToUse[0];
+				}
+				else if(i == platformMatrix[0].size() - 1){ //right corner
+					platformMatrix[j][i] = tilesToUse[2];
+				}else{
+					if(tilesXAxisBtwn > 0){
+						platformMatrix[j][i] = tilesToUse[1];
+					}
+				}
+			}
+		}
+	} 
+	
+	std::cout << "platformMatrix (" << platformMatrix.size()
+	          << " x " << (platformMatrix.empty() ? 0 : platformMatrix[0].size())
+	          << "):\n";
+	for (size_t row = 0; row < platformMatrix.size(); ++row) {
+		std::cout << "  [";
+		for (size_t col = 0; col < platformMatrix[row].size(); ++col) {
+			std::cout << platformMatrix[row][col];
+			if (col + 1 < platformMatrix[row].size()) std::cout << ", ";
+		}
+		std::cout << "]\n";
+	}
+	std::cout.flush();
+
+	return platformMatrix;
+}
+std::vector<std::vector<int>> Level::buildMultiFaceCloud(int faces){
+	std::vector<std::vector<int>> cloudToRet(faces,std::vector<int>(faces+2,-1)); 
+}
+void Level::placeScrewPlatform(const std::vector<std::vector<int>>& platf, int Xpos, int Ypos){
+	// platf is row-major: platf[row(Y)][col(X)]. row 0 is the bottom row.
+	// -1 means "leave whatever is already there" (unfilled cell from buildScrewPlatform).
+	for(int row = 0; row < platf.size(); row++){
+		for(int col = 0; col < platf[row].size(); col++){
+			if(platf[row][col] == -1){
+				continue;
+			}
+			int ty = Ypos + row;
+			int tx = Xpos + col;
+			if(ty < 0 || ty >= (int)levelTiles.size()){
+				continue;
+			} 
+			if(tx < 0 || tx >= (int)levelTiles[ty].size()){
+				continue;
+			} 
+			levelTiles[ty][tx] = platf[row][col];
+		}
+	}
 }
 void Level::level_1_1(){
 	static int LEVEL1_1_WIDTH = 176;
@@ -103,6 +217,11 @@ void Level::level_1_1(){
 	placeSingleTileObject(QUESTION_BLOCK_1,12,4);
 	placeSingleTileObject(QUESTION_BLOCK_1,14,7);
 	placeSingleTileObject(QUESTION_BLOCK_1,15,7);
+
+	std::vector<std::vector<int>> pinkPlatform = buildScrewPlatform("PINK", 1, 1);
+	std::vector<std::vector<int>> bluePlatform = buildScrewPlatform("BLUE",1, 3);
+	placeScrewPlatform(bluePlatform, 17, 1);
+	placeScrewPlatform(pinkPlatform, 15, 1); // bottom-left corner lands at (X=15, Y=2)
 }
 //below is what Jakowski uses for the triangles of blocks. bDir is true for acuse, false for obtuse.
 //X is where on map it starts, y is where on Y axis it starts, 4 is height in tiles at end 
