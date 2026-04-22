@@ -2,6 +2,7 @@
 #include <vector>
 #include "Items.h"
 #include "Tiles.h"
+#include "Shapes.h"
 #include <string>
 class Level{
 	private:
@@ -11,8 +12,7 @@ class Level{
 		void buildSteps(int X, int Y, int iSize, bool accOrObt); // true = ACCUTE, false = OBTUSE
 		void placeSingleTileObject(Tiles t, int Xpos, int Ypos);
 		//void buildPipe(int X, int Y, int shaftHeight = 1)
-		std::vector<std::vector<int>> buildScrewPlatform(std::string color, int tilesXAxisBtwn, int tilesYAxisBtwn);
-		void placeScrewPlatform(const std::vector<std::vector<int>>& platf, int Xpos, int Ypos);
+		void placeScrewPlatformOrCloud(const TileMatrix& platfOrCloud, int Xpos, int Ypos);
 		void addItem(Items item, int X, int Y);
 		void level_1_1();
 		const std::vector<std::vector<int>>& getTiles() const { return levelTiles; }

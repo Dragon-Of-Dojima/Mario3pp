@@ -104,6 +104,12 @@ bool Game::init(){
 	tileFiles[WHITE_PLATFORM_SHADOW_TOP]          = "public/images/tiles/whitePlatformShadowTop.bmp";
 	tileFiles[WHITE_PLATFORM_SHADOW_EDGE]         = "public/images/tiles/whitePlatformShadowEdge.bmp";
 	tileFiles[WHITE_PLATFORM_SHADOW_BOTTOM]       = "public/images/tiles/whitePlatformShadowBottom.bmp";
+	tileFiles[CLOUD_MULTI_HEAD]           = "public/images/tiles/eyeCloudMultiInnerHead.bmp";
+	tileFiles[CLOUD_MULTI_LEFT_SHOULDER]  = "public/images/tiles/eyeCloudMultiTopLeft.bmp";
+	tileFiles[CLOUD_MULTI_RIGHT_SHOULDER] = "public/images/tiles/eyeCloudMultiTopRight.bmp";
+	tileFiles[CLOUD_MULTI_BOTTOM_LEFT]    = "public/images/tiles/eyeCloudMultiBottomLeft.bmp";
+	tileFiles[CLOUD_MULTI_BOTTOM_CENTER]  = "public/images/tiles/eyeCloudMultiBottomCenter.bmp";
+	tileFiles[CLOUD_MULTI_BOTTOM_RIGHT]   = "public/images/tiles/eyeCloudMultiBottomRight.bmp";
 
 	for(int i = 0; i < TILE_COUNT; i++){
 		if(tileFiles[i] == nullptr) continue;
