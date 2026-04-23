@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <SDL2/SDL_image.h>
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -26,6 +27,14 @@ bool Game::init(){
 		std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return false;
+	}
+
+	SDL_Surface* iconSurf = IMG_Load("app.png");
+	if (iconSurf != nullptr) {
+		SDL_SetWindowIcon(this->window, iconSurf);
+		SDL_FreeSurface(iconSurf);
+	} else {
+		std::cerr << "Failed to load app.png: " << IMG_GetError() << std::endl;
 	}
 
 	this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -110,9 +119,15 @@ bool Game::init(){
 	tileFiles[CLOUD_MULTI_BOTTOM_LEFT]    = "public/images/tiles/eyeCloudMultiBottomLeft.bmp";
 	tileFiles[CLOUD_MULTI_BOTTOM_CENTER]  = "public/images/tiles/eyeCloudMultiBottomCenter.bmp";
 	tileFiles[CLOUD_MULTI_BOTTOM_RIGHT]   = "public/images/tiles/eyeCloudMultiBottomRight.bmp";
+	tileFiles[PIPE_TOP_LEFT]   = "public/images/tiles/pipeGreenBlackTopLeft.bmp";
+	tileFiles[PIPE_TOP_RIGHT]  = "public/images/tiles/pipeGreenBlackTopRight.bmp";
+	tileFiles[PIPE_LEFT_EDGE]  = "public/images/tiles/pipeGreenBlackBottomLeft.bmp";
+	tileFiles[PIPE_RIGHT_EDGE] = "public/images/tiles/pipeGreenBlackBottomRight.bmp";
 
 	for(int i = 0; i < TILE_COUNT; i++){
-		if(tileFiles[i] == nullptr) continue;
+		if(tileFiles[i] == nullptr){
+			continue;
+		}
 		SDL_Surface* surf = SDL_LoadBMP(tileFiles[i]);
 		if(surf == nullptr){
 			std::cerr << "Failed to load tile " << i << ": " << SDL_GetError() << std::endl;

@@ -52,7 +52,7 @@ void Level::placeSingleTileObject(Tiles t, int Xpos, int Ypos){ //passing a poin
 	levelTiles[Ypos][Xpos] = t;
 }
 
-void Level::placeScrewPlatformOrCloud(const TileMatrix& platfOrCloud, int Xpos, int Ypos){
+void Level::placeRectangularShape(const TileMatrix& platfOrCloud, int Xpos, int Ypos){
 	// platf is row-major: platf[row(Y)][col(X)]. row 0 is the bottom row.
 	// -1 means "leave whatever is already there" (unfilled cell from buildScrewPlatform).
 	for(size_t row = 0; row < platfOrCloud.size(); row++){
@@ -116,10 +116,14 @@ void Level::level_1_1(){
 
 	TileMatrix pinkPlatform = shapes::buildScrewPlatform("PINK", 1, 1);
 	TileMatrix bluePlatform = shapes::buildScrewPlatform("BLUE", 1, 3);
-	placeScrewPlatformOrCloud(bluePlatform, 17, 1);
-	placeScrewPlatformOrCloud(pinkPlatform, 15, 1); // bottom-left corner lands at (X=15, Y=2)
+	placeRectangularShape(bluePlatform, 17, 1);
+	placeRectangularShape(pinkPlatform, 15, 1); // bottom-left corner lands at (X=15, Y=2)
 	TileMatrix firstCloud = shapes::buildMultiFaceCloud(2);
-	placeScrewPlatformOrCloud(firstCloud, 7, 8);
+	placeRectangularShape(firstCloud, 7, 8);
+	TileMatrix firstPipe = shapes::buildPipe(1);
+	placeRectangularShape(firstPipe,22, 1);
+	TileMatrix firstSingleCloud = shapes::oneFaceCloudA;
+	placeRectangularShape(firstSingleCloud,20, 9);
 }
 
 // is identical to structGND but uses different tiles
