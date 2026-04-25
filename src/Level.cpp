@@ -95,7 +95,7 @@ void Level::level_1_1(){
 	static int LEVEL1_1_HEIGHT = 27;
 	levelTiles.assign(LEVEL1_1_HEIGHT, std::vector<int>(LEVEL1_1_WIDTH, BLUESKY));
 	buildGround(0, 0, 39, 1);
-	buildGround(29, 0, 29, 2);
+	buildGround(39, 0, 29, 2);
 	for(size_t row = 0; row < shapes::bushSetOne.size(); row++){
 		for(size_t col = 0; col < shapes::bushSetOne[row].size(); col++){
 			levelTiles[1 + row][1 + col] = shapes::bushSetOne[row][col];
@@ -109,10 +109,19 @@ void Level::level_1_1(){
 	placeSingleTileObject(BUSH_ALONE,10,1);
 	placeSingleTileObject(BUSH_ALONE,11,1);
 	placeSingleTileObject(BUSH_ALONE,12,1);
+	placeSingleTileObject(BUSH_ALONE,42,2);
+	placeSingleTileObject(BUSH_ALONE,43,2);
+	placeSingleTileObject(BUSH_ALONE,44,2);
+	placeSingleTileObject(BUSH_ALONE,45,2);
+	placeSingleTileObject(BUSH_ALONE,46,2);
+	placeSingleTileObject(BUSH_ALONE,47,2);
 	placeSingleTileObject(QUESTION_BLOCK_1,11,4);
 	placeSingleTileObject(QUESTION_BLOCK_1,12,4);
 	placeSingleTileObject(QUESTION_BLOCK_1,14,7);
 	placeSingleTileObject(QUESTION_BLOCK_1,15,7);
+	placeSingleTileObject(QUESTION_BLOCK_1,26,6);
+	placeSingleTileObject(QUESTION_BLOCK_1,41,2);
+	placeSingleTileObject(QUESTION_BLOCK_1,44,4);
 
 	TileMatrix pinkPlatform = shapes::buildScrewPlatform("PINK", 1, 1);
 	TileMatrix bluePlatform = shapes::buildScrewPlatform("BLUE", 1, 3);
@@ -124,6 +133,14 @@ void Level::level_1_1(){
 	placeRectangularShape(firstPipe,22, 1);
 	TileMatrix firstSingleCloud = shapes::oneFaceCloudA;
 	placeRectangularShape(firstSingleCloud,20, 9);
+	TileMatrix greenPlatform = shapes::buildScrewPlatform("GREEN",3,1);
+	TileMatrix secondPinkPlatform = shapes::buildScrewPlatform("PINK",2,3);
+	TileMatrix firstWhitePlatform = shapes::buildScrewPlatform("WHITE",2,5);
+	placeRectangularShape(firstWhitePlatform,32,1);
+	placeRectangularShape(secondPinkPlatform,29,1);
+	placeRectangularShape(greenPlatform,25,1);
+	TileMatrix secondGreenPlatform = shapes::buildScrewPlatform("GREEN",4,0);
+	placeRectangularShape(secondGreenPlatform,32,1);
 }
 
 // is identical to structGND but uses different tiles
