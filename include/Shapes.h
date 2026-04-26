@@ -20,6 +20,7 @@ namespace shapes {
 	extern const TileMatrix oneFaceCloudB;
 
 	TileMatrix buildScrewPlatform(const std::string& color, int innerW, int innerH);
+	TileMatrix shadowfy(TileMatrix& platform, std::string type = "ground",std::string colorBehind = "transparent");
 	TileMatrix buildMultiFaceCloud(int faces);
 	TileMatrix buildPipe(int levelsGreaterThanMinHeight);
 

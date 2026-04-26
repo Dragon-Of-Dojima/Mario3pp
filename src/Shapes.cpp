@@ -1,44 +1,50 @@
 #include "Shapes.h"
 #include "Tiles.h"
+#include <unordered_map>
 
 // Tile ID legend (see Tiles.h). Re-sync these numbers if the enum is reordered.
 //   0 = BLUESKY
 //   8 = PIPE_TOP_LEFT                      9 = PIPE_TOP_RIGHT
 //  10 = PIPE_LEFT_EDGE                    11 = PIPE_RIGHT_EDGE
-//  95 = CHECKERBUSH_LEFT_EDGE             96 = CHECKERBUSH_RIGHT_EDGE
-//  97 = CHECKERBUSH_INNER
-//  98 = CHECKERBUSH_TOP_LEFT_WITH_BEHIND  99 = CHECKERBUSH_TOP_RIGHT_WITH_BEHIND
-// 100 = CHECKERBUSH_TOP_LEFT             101 = CHECKERBUSH_TOP_RIGHT
+//  82 = CLOUD_MULTI_HEAD                  83 = CLOUD_MULTI_LEFT_SHOULDER
+//  84 = CLOUD_MULTI_RIGHT_SHOULDER        85 = CLOUD_MULTI_BOTTOM_LEFT
+//  86 = CLOUD_MULTI_BOTTOM_CENTER         87 = CLOUD_MULTI_BOTTOM_RIGHT
+//  88 = CLOUD_SINGLE_TOP_LEFT             89 = CLOUD_SINGLE_TOP_RIGHT
+//  90 = CLOUD_SINGLE_BOTTOM_LEFT          91 = CLOUD_SINGLE_BOTTOM_RIGHT
+//  96 = CHECKERBUSH_LEFT_EDGE             97 = CHECKERBUSH_RIGHT_EDGE
+//  98 = CHECKERBUSH_INNER
+//  99 = CHECKERBUSH_TOP_LEFT_WITH_BEHIND 100 = CHECKERBUSH_TOP_RIGHT_WITH_BEHIND
+// 101 = CHECKERBUSH_TOP_LEFT             102 = CHECKERBUSH_TOP_RIGHT
 
 namespace shapes {
 
 	const TileMatrix bushSetOne = {
-		{95,97,97,97,96},
-		{95,98,99,97,96},
-		{100,99,96,100,101},
-		{0,100,101,0,0}
+		{96,98,98,98,97},
+		{96,99,100,98,97},
+		{101,100,97,101,102},
+		{0,101,102,0,0}
 	};
-	const TileMatrix bushSetTwo = { //[0][0] is 101 when standalone
-		{98,99,97,96},
-		{0,95,98,101},
-		{0,100,101,0}
+	const TileMatrix bushSetTwo = { //[0][0] is 102 when standalone
+		{99,100,98,97},
+		{0,96,99,102},
+		{0,101,102,0}
 	};
-	const TileMatrix bushSetTwoHalf = { //[0][0] is 101 when standalone
-		{101,99,97,96},
-		{0,95,98,101},
-		{0,100,101,0}
+	const TileMatrix bushSetTwoHalf = { //[0][0] is 102 when standalone
+		{102,100,98,97},
+		{0,96,99,102},
+		{0,101,102,0}
 	};
 	const TileMatrix smallestPossiblePipe = {
 		{10,11},
 		{8,9}
 	};
 	const TileMatrix oneFaceCloudA = {
-		{84,85,86},
-		{82,81,83}
+		{85,86,87},
+		{83,82,84}
 	};
 	const TileMatrix oneFaceCloudB = {
-		{89,90},
-		{87,88}
+		{90,91},
+		{88,89}
 	};
 
 	TileMatrix buildScrewPlatform(const std::string& color, int innerW, int innerH){
@@ -118,6 +124,50 @@ namespace shapes {
 		}
 
 		return platformMatrix;
+	}
+
+	TileMatrix shadowfy(TileMatrix& platform, std::string type, std::string colorBehind){
+		static const std::unordered_map<std::string, std::vector<int>> shadowTiles = {
+			{"PINK",	{PINK_PLATFORM_SHADOW_TOP,  PINK_PLATFORM_SHADOW_EDGE,  PINK_PLATFORM_SHADOW_BOTTOM}},
+			{"BLUE",	{BLUE_PLATFORM_SHADOW_TOP,  BLUE_PLATFORM_SHADOW_EDGE,  BLUE_PLATFORM_SHADOW_BOTTOM}},
+			{"WHITE",	{WHITE_PLATFORM_SHADOW_TOP, WHITE_PLATFORM_SHADOW_EDGE, WHITE_PLATFORM_SHADOW_BOTTOM}},
+			{"GREEN",	{GREEN_PLATFORM_SHADOW_TOP, GREEN_PLATFORM_SHADOW_EDGE, GREEN_PLATFORM_SHADOW_BOTTOM}},
+			{"TRANSPARENT", {SHADOW_OVER_TRANSPARENT_TOP_RIGHT_CORNER, SHADOW_OVER_TRANSPARENT_RIGHTEDGE, SHADOW_OVER_TRANSPARENT_BR, 
+				SHADOW_OVER_TRANSPARENT_BL, SHADOW_OVER_TRANSPARENT_BHE
+			}}
+		};
+		// +1 to span under the right-edge shadow column that gets appended below.
+		std::vector<int> shadowBottomRow(platform[0].size() + 1, -1);
+		if(type == "insky"){
+			const size_t n = shadowBottomRow.size();
+			for(size_t q = 0; q < n; q++){
+				if(q == 0){
+					shadowBottomRow[q] = shadowTiles.at(colorBehind)[3]; // BL
+				}
+				else if(q < n - 1){
+					shadowBottomRow[q] = shadowTiles.at(colorBehind)[4]; // BHE
+				}
+				else{
+					shadowBottomRow[q] = shadowTiles.at(colorBehind)[2]; // BR (corner)
+				}
+			}
+		}
+		const size_t numRows = platform.size();
+		for(size_t j = 0; j < numRows; j++){
+			if(j == 0){ //bottom row
+				platform[j].push_back(shadowTiles.at(colorBehind)[2]);
+			}
+			else if(j < numRows - 1){ //side edge
+				platform[j].push_back(shadowTiles.at(colorBehind)[1]);
+			}
+			else{ // j == numRows - 1, top
+				platform[j].push_back(shadowTiles.at(colorBehind)[0]);
+			}
+		}
+		if(type == "insky"){
+			platform.insert(platform.begin(),shadowBottomRow);
+		}
+		return platform;
 	}
 
 	TileMatrix buildMultiFaceCloud(int faces){

@@ -123,6 +123,11 @@ bool Game::init(){
 	tileFiles[PIPE_TOP_RIGHT]  = "public/images/tiles/pipeGreenBlackTopRight.bmp";
 	tileFiles[PIPE_LEFT_EDGE]  = "public/images/tiles/pipeGreenBlackBottomLeft.bmp";
 	tileFiles[PIPE_RIGHT_EDGE] = "public/images/tiles/pipeGreenBlackBottomRight.bmp";
+	tileFiles[SHADOW_OVER_TRANSPARENT_BL]        = "public/images/tiles/shadowBottomLeft.bmp";
+	tileFiles[SHADOW_OVER_TRANSPARENT_BHE]        = "public/images/tiles/shadowBottom.bmp";
+	tileFiles[SHADOW_OVER_TRANSPARENT_BR]        = "public/images/tiles/shadowBottomRight.bmp";
+	tileFiles[SHADOW_OVER_TRANSPARENT_RIGHTEDGE] = "public/images/tiles/shadowRightEdge.bmp";
+	tileFiles[SHADOW_OVER_TRANSPARENT_TOP_RIGHT_CORNER] = "public/images/tiles/shadowRightCorner.bmp";
 
 	for(int i = 0; i < TILE_COUNT; i++){
 		if(tileFiles[i] == nullptr){
