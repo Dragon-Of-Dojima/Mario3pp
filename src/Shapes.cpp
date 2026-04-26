@@ -24,13 +24,13 @@ namespace shapes {
 		{101,100,97,101,102},
 		{0,101,102,0,0}
 	};
-	const TileMatrix bushSetTwo = { //[0][0] is 102 when standalone
+	const TileMatrix bushSetTwo = { 
 		{99,100,98,97},
 		{0,96,99,102},
 		{0,101,102,0}
 	};
-	const TileMatrix bushSetTwoHalf = { //[0][0] is 102 when standalone
-		{102,100,98,97},
+	const TileMatrix bushSetFour = { //basically the same as above but standalone
+		{101,100,98,97},
 		{0,96,99,102},
 		{0,101,102,0}
 	};
@@ -155,7 +155,13 @@ namespace shapes {
 		const size_t numRows = platform.size();
 		for(size_t j = 0; j < numRows; j++){
 			if(j == 0){ //bottom row
-				platform[j].push_back(shadowTiles.at(colorBehind)[2]);
+				if(colorBehind != "TRANSPARENT"){
+					platform[j].push_back(shadowTiles.at(colorBehind)[2]);
+				}
+				else{
+					platform[j].push_back(shadowTiles.at(colorBehind)[1]);
+				}
+				
 			}
 			else if(j < numRows - 1){ //side edge
 				platform[j].push_back(shadowTiles.at(colorBehind)[1]);

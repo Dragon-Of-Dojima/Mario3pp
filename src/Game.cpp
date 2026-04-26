@@ -10,7 +10,7 @@ Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTic
 	} 
 }
 
-//static enum colorsToIgnore = {"ff80c0"}
+//static enum colorsToIgnore = {"#ff80c0"}
 
 bool Game::init(){
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {

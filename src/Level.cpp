@@ -96,6 +96,7 @@ void Level::level_1_1(){
 	levelTiles.assign(LEVEL1_1_HEIGHT, std::vector<int>(LEVEL1_1_WIDTH, BLUESKY));
 	buildGround(0, 0, 39, 1);
 	buildGround(39, 0, 29, 2);
+	buildGround(72, 0, 22, 1);
 	for(size_t row = 0; row < shapes::bushSetOne.size(); row++){
 		for(size_t col = 0; col < shapes::bushSetOne[row].size(); col++){
 			levelTiles[1 + row][1 + col] = shapes::bushSetOne[row][col];
@@ -115,6 +116,9 @@ void Level::level_1_1(){
 	placeSingleTileObject(BUSH_ALONE,45,2);
 	placeSingleTileObject(BUSH_ALONE,46,2);
 	placeSingleTileObject(BUSH_ALONE,47,2);
+	placeSingleTileObject(BUSH_ALONE,74,1);
+	placeSingleTileObject(BUSH_ALONE,75,1);
+	placeSingleTileObject(BUSH_ALONE,76,1);
 	placeSingleTileObject(QUESTION_BLOCK_1,11,4);
 	placeSingleTileObject(QUESTION_BLOCK_1,12,4);
 	placeSingleTileObject(QUESTION_BLOCK_1,14,7);
@@ -126,6 +130,7 @@ void Level::level_1_1(){
 	TileMatrix pinkPlatform = shapes::buildScrewPlatform("PINK", 1, 1);
 	shapes::shadowfy(pinkPlatform,"ground","BLUE");
 	TileMatrix bluePlatform = shapes::buildScrewPlatform("BLUE", 1, 3);
+	shapes::shadowfy(bluePlatform,"ground","TRANSPARENT");
 	placeRectangularShape(bluePlatform, 17, 1);
 	placeRectangularShape(pinkPlatform, 15, 1); // bottom-left corner lands at (X=15, Y=2)
 	TileMatrix firstCloud = shapes::buildMultiFaceCloud(2);
@@ -135,13 +140,22 @@ void Level::level_1_1(){
 	TileMatrix firstSingleCloud = shapes::oneFaceCloudA;
 	placeRectangularShape(firstSingleCloud,20, 9);
 	TileMatrix greenPlatform = shapes::buildScrewPlatform("GREEN",3,1);
+	shapes::shadowfy(greenPlatform,"ground","PINK");
 	TileMatrix secondPinkPlatform = shapes::buildScrewPlatform("PINK",2,3);
+	shapes::shadowfy(secondPinkPlatform,"ground","WHITE");
 	TileMatrix firstWhitePlatform = shapes::buildScrewPlatform("WHITE",2,5);
+	shapes::shadowfy(firstWhitePlatform,"ground","TRANSPARENT");
 	placeRectangularShape(firstWhitePlatform,32,1);
 	placeRectangularShape(secondPinkPlatform,29,1);
 	placeRectangularShape(greenPlatform,25,1);
 	TileMatrix secondGreenPlatform = shapes::buildScrewPlatform("GREEN",4,0);
+	shapes::shadowfy(secondGreenPlatform,"ground","TRANSPARENT");
 	placeRectangularShape(secondGreenPlatform,32,1);
+	//pink box in sky is at x=82 tiles, y = 14 tiles 
+	TileMatrix pinkPlatformInSky = shapes::buildScrewPlatform("PINK",2,0);
+	shapes::shadowfy(pinkPlatformInSky,"insky","TRANSPARENT");
+	placeRectangularShape(pinkPlatformInSky,82,14);
+	//placeRectangularShape(shapes::bushSetTwoHalf,72,1);
 }
 
 // is identical to structGND but uses different tiles
