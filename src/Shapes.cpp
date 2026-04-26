@@ -126,7 +126,7 @@ namespace shapes {
 		return platformMatrix;
 	}
 
-	TileMatrix shadowfy(TileMatrix& platform, std::string type, std::string colorBehind){
+	void shadowfy(TileMatrix& platform, std::string type, std::string colorBehind){
 		static const std::unordered_map<std::string, std::vector<int>> shadowTiles = {
 			{"PINK",	{PINK_PLATFORM_SHADOW_TOP,  PINK_PLATFORM_SHADOW_EDGE,  PINK_PLATFORM_SHADOW_BOTTOM}},
 			{"BLUE",	{BLUE_PLATFORM_SHADOW_TOP,  BLUE_PLATFORM_SHADOW_EDGE,  BLUE_PLATFORM_SHADOW_BOTTOM}},
@@ -167,7 +167,6 @@ namespace shapes {
 		if(type == "insky"){
 			platform.insert(platform.begin(),shadowBottomRow);
 		}
-		return platform;
 	}
 
 	TileMatrix buildMultiFaceCloud(int faces){

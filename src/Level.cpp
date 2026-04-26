@@ -124,10 +124,10 @@ void Level::level_1_1(){
 	placeSingleTileObject(QUESTION_BLOCK_1,44,4);
 
 	TileMatrix pinkPlatform = shapes::buildScrewPlatform("PINK", 1, 1);
-	TileMatrix pinkPlatformShadowfied = shapes::shadowfy(pinkPlatform,"ground","BLUE");
+	shapes::shadowfy(pinkPlatform,"ground","BLUE");
 	TileMatrix bluePlatform = shapes::buildScrewPlatform("BLUE", 1, 3);
 	placeRectangularShape(bluePlatform, 17, 1);
-	placeRectangularShape(pinkPlatformShadowfied, 15, 1); // bottom-left corner lands at (X=15, Y=2)
+	placeRectangularShape(pinkPlatform, 15, 1); // bottom-left corner lands at (X=15, Y=2)
 	TileMatrix firstCloud = shapes::buildMultiFaceCloud(2);
 	placeRectangularShape(firstCloud, 7, 8);
 	TileMatrix firstPipe = shapes::buildPipe(1);
