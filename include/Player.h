@@ -1,12 +1,13 @@
 #pragma once
-#include <SDL2/SDL_image.h>
-#include <vector>
+#include <SDL2/SDL.h>
+#include "Level.h"
 
 class Player{
 	private:
 		float playerX;
 		float playerY;
 		float floorY;
+		float velocityX;
 		float velocityY;
 		float animTimer;
 		SDL_Texture* texStand;
@@ -15,9 +16,13 @@ class Player{
 		bool isFacingLeft;
 		int standW, standH, stepW, stepH, jumpW, jumpH;
 	public:
-		Player(float playerX, float playerY, float floorY);
+		Player();
+		~Player();
+		bool loadTextures(SDL_Renderer* renderer);
+		void destroyTextures();
+		void spawn(float x, float floorY);
+		int getStandHeight() const { return standH; }
 		void handleInput(const Uint8* keys);
 		void update(float dt, const Level& level);
-		void render(SDL_Renderer* r);
-
-	}
+		void render(SDL_Renderer* renderer);
+};

@@ -143,31 +143,11 @@ bool Game::init(){
 		SDL_FreeSurface(surf);
 	}
 
-	SDL_Surface* spriteStand = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStanding.bmp");
-	SDL_Surface* spriteStep = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioStep.bmp");
-	SDL_Surface* spriteJump = SDL_LoadBMP("public/images/mariosprites/smallmario/smallMarioJump.bmp");
-	std::vector<SDL_Surface*> sprites = {spriteStand,spriteStep,spriteJump};
-	for(SDL_Surface* sprite : sprites){
-		if (sprite == nullptr) {
-			std::cerr << "SDL_LoadBMP failed: " << SDL_GetError() << std::endl;
-			return false;
-		}
+	if(!player.loadTextures(this->renderer)){
+		return false;
 	}
-	SDL_SetColorKey(spriteStand, SDL_TRUE, SDL_MapRGB(spriteStand->format, 0xFF, 0x80, 0xC0));
-	SDL_SetColorKey(spriteStep, SDL_TRUE, SDL_MapRGB(spriteStep->format, 0xFF, 0x80, 0xC0));
-	SDL_SetColorKey(spriteJump, SDL_TRUE, SDL_MapRGB(spriteJump->format, 0xFF, 0x80, 0xC0));
-	this->texStand = SDL_CreateTextureFromSurface(this->renderer, spriteStand);
-	this->texStep = SDL_CreateTextureFromSurface(this->renderer, spriteStep);
-	this->texJump = SDL_CreateTextureFromSurface(this->renderer, spriteJump);
-	
-	SDL_FreeSurface(spriteStand);
-	SDL_FreeSurface(spriteStep);
-	SDL_FreeSurface(spriteJump);
-
-	int sh; //standing height of sprite
-	SDL_QueryTexture(texStand, NULL, NULL, NULL, &sh);
-	this->floorY = (720.f - TILE_SIZE) - sh;
-	this->playerY = this->floorY;
+	const float floorY = (720.f - TILE_SIZE) - player.getStandHeight();
+	player.spawn(48.f, floorY);
 
 	return true;
 	
@@ -209,36 +189,9 @@ void Game::handleEvents(){
 	}
 }
 void Game::update(float dt){
-	//this->animTimer = 0.f;
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
-	float speed = 400.f;
-	this->velocityY += 800.f * dt;
-	playerY += this->velocityY * dt;
-	if(playerY > this->floorY){
-		playerY = this->floorY;
-		this->velocityY = 0;
-	}
-	if (keys[SDL_SCANCODE_LEFT]){
-		if(this->isFacingLeft == false){
-			this->isFacingLeft = true;
-		}
-		playerX -= speed * dt;
-		this->animTimer += dt;
-	}
-	if (keys[SDL_SCANCODE_RIGHT]){
-		if(this->isFacingLeft == true){
-			this->isFacingLeft = false;
-		}
-		playerX += speed * dt;
-		this->animTimer += dt;
-	} 
-	if (keys[SDL_SCANCODE_SPACE] && playerY >= this->floorY){
-		this->velocityY = -400.f;
-	}
-	if (!keys[SDL_SCANCODE_LEFT] && !keys[SDL_SCANCODE_RIGHT]) {
-		this->animTimer = 0.f;
-	 } 
-	// if (keys[SDL_SCANCODE_DOWN])  playerY += speed * dt;
+	player.handleInput(keys);
+	player.update(dt,level);
 }
 void Game::render(){
 	SDL_SetRenderDrawColor(this->renderer, 0xAF, 0xF9, 0xF0, 0xFF);
@@ -254,42 +207,16 @@ void Game::render(){
 		}
 	}
 
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	int standW, standH, stepW, stepH, jumpW, jumpH;
-	SDL_QueryTexture(texStand, NULL, NULL, &standW, &standH);
-	SDL_QueryTexture(texStep, NULL, NULL, &stepW, &stepH);
-	SDL_QueryTexture(texJump, NULL, NULL, &jumpW, &jumpH);
-	int drawW = standW;
-	int drawH = standH;
-	SDL_Texture* currentTex = this->texStand;
-	bool useStepSprite = fmod(animTimer, 0.3f) > 0.15f;
-	
-	if(useStepSprite){
-		currentTex = this->texStep;
-		drawW = stepW;
-		drawH = stepH;
-	}
-	if (playerY < floorY) {
-		currentTex = this->texJump;
-		drawW = jumpW;
-		drawH = jumpH;
-	}
-	SDL_Rect player = { (int)playerX, (int)playerY, drawW, drawH };
-
-
-	SDL_RendererFlip flip = isFacingLeft ?  SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-	SDL_RenderCopyEx(renderer, currentTex, NULL, &player, 0.0, NULL, flip);
+	player.render(this->renderer);
 	SDL_RenderPresent(this->renderer);
 }
 Game::~Game(){
 	this->isRunning = false;
 	if (this->renderer != nullptr) {
+		player.destroyTextures();
 		for(int i = 0; i < TILE_COUNT; i++){
 			if(tileTextures[i] != nullptr) SDL_DestroyTexture(tileTextures[i]);
 		}
-		SDL_DestroyTexture(texJump);
-		SDL_DestroyTexture(texStand);
-		SDL_DestroyTexture(texStep);
 		SDL_DestroyRenderer(renderer);
 		this->renderer = nullptr;
 	}
