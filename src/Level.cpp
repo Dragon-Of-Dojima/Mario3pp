@@ -155,7 +155,7 @@ void Level::level_1_1(){
 	TileMatrix pinkPlatformInSky = shapes::buildScrewPlatform("PINK",2,0);
 	shapes::shadowfy(pinkPlatformInSky,"insky","TRANSPARENT");
 	placeRectangularShape(pinkPlatformInSky,82,14);
-	//placeRectangularShape(shapes::bushSetTwoHalf,72,1);
+	placeRectangularShape(shapes::bushSetThree,51,2);
 }
 
 // is identical to structGND but uses different tiles

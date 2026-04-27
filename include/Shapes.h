@@ -14,7 +14,8 @@ namespace shapes {
 
 	extern const TileMatrix bushSetOne;
 	extern const TileMatrix bushSetTwo;
-	extern const TileMatrix bushSetTwoHalf;
+	extern const TileMatrix bushSetThree;
+	extern const TileMatrix bushSetFour;
 	extern const TileMatrix smallestPossiblePipe;
 	extern const TileMatrix oneFaceCloudA;
 	extern const TileMatrix oneFaceCloudB;

@@ -9,16 +9,6 @@ class Game{
 		SDL_Renderer* renderer;
 		SDL_Event event;
 		bool isRunning;
-		float playerX;
-		float playerY;
-		float floorY;
-		float velocityY;
-		SDL_Texture* texStand;
-		SDL_Texture* texStep;
-		SDL_Texture* texJump;
-		bool isFacingLeft;
-		int standW, standH, stepW, stepH, jumpW, jumpH;
-		float animTimer;
 		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;
 		static const int TILE_SIZE = 16;

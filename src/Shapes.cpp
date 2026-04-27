@@ -29,6 +29,10 @@ namespace shapes {
 		{0,96,99,102},
 		{0,101,102,0}
 	};
+	const TileMatrix bushSetThree = {
+		{101,100,98,98,98,98,98,97},
+		{0,96,99,100,99,100,98,97}
+	};
 	const TileMatrix bushSetFour = { //basically the same as above but standalone
 		{101,100,98,97},
 		{0,96,99,102},

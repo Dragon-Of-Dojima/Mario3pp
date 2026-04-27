@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 
-Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0), playerX(48), playerY(0), texStand(nullptr), texStep(nullptr), texJump(nullptr), velocityY(0),animTimer(0.0),isFacingLeft(false){
+Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0){
 	for(int i = 0; i < TILE_COUNT; i++){
 		tileTextures[i] = nullptr;
 	} 
