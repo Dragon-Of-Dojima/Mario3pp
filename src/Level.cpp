@@ -49,7 +49,15 @@ void Level::buildGround(int X, int Y, int gWidth, int gHeight) {
 }
 
 void Level::placeSingleTileObject(Tiles t, int Xpos, int Ypos){ //passing a pointer for T would be bigger bc an int is 4B, pointer 8B
-	levelTiles[Ypos][Xpos] = t;
+	this->levelTiles[Ypos][Xpos] = t;
+}
+int Level::tileAt(int col, int row) const{
+	if(row > this->levelTiles.size() - 1 || col > this->levelTiles[row].size() - 1 || row < 0 || col < 0){
+		std::cout << "OUT OF BOUNDS" << std::endl;			
+		return BLUESKY;
+	}
+	std::cout << this->levelTiles[row][col] << std::endl;
+	return this->levelTiles[row][col];
 }
 
 void Level::placeRectangularShape(const TileMatrix& platfOrCloud, int Xpos, int Ypos){
@@ -68,7 +76,7 @@ void Level::placeRectangularShape(const TileMatrix& platfOrCloud, int Xpos, int 
 			if(tx < 0 || tx >= (int)levelTiles[ty].size()){
 				continue;
 			}
-			levelTiles[ty][tx] = platfOrCloud[row][col];
+			this->levelTiles[ty][tx] = platfOrCloud[row][col];
 		}
 	}
 }
@@ -156,6 +164,15 @@ void Level::level_1_1(){
 	shapes::shadowfy(pinkPlatformInSky,"insky","TRANSPARENT");
 	placeRectangularShape(pinkPlatformInSky,82,14);
 	placeRectangularShape(shapes::bushSetThree,51,2);
+	tileAt(5,9); //0
+	tileAt(0,0); //stoneleft
+	tileAt(25,1);
+	tileAt(30,1);
+	tileAt(0,176);
+	tileAt(2,5);
+	tileAt(46,2);
+	tileAt(51,3);
+	tileAt(44,4); //should be a question block!
 }
 
 // is identical to structGND but uses different tiles

@@ -13,7 +13,7 @@ class Player{
 		SDL_Texture* texStand;
 		SDL_Texture* texStep;
 		SDL_Texture* texJump;
-		bool isFacingLeft;
+		bool isFacingLeft, isHoldingRun, isInAir;
 		int standW, standH, stepW, stepH, jumpW, jumpH;
 	public:
 		Player();
@@ -22,7 +22,7 @@ class Player{
 		void destroyTextures();
 		void spawn(float x, float floorY);
 		int getStandHeight() const { return standH; }
-		void handleInput(const Uint8* keys);
+		void handleInput(const Uint8* keys, bool holdingRun = false);
 		void update(float dt, const Level& level);
 		void render(SDL_Renderer* renderer);
 };

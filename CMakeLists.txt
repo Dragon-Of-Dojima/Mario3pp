@@ -4,8 +4,14 @@ project(Mario3pp LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(MARIO_DEBUG "Build Mario3pp with debug features enabled" OFF)
+
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_executable(Mario3pp ${SOURCES})
+
+if(MARIO_DEBUG)
+    target_compile_definitions(Mario3pp PRIVATE MARIO_DEBUG)
+endif()
 
 # Manual way: list each .cpp file explicitly
 # add_executable(Mario3pp

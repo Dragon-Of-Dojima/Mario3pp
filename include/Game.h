@@ -9,6 +9,9 @@ class Game{
 		SDL_Window* window;
 		SDL_Renderer* renderer;
 		SDL_Event event;
+		static const int GAME_WIDTH_DEBUG = 1600;
+		static const int GAME_WIDTH_PROD = 1286;
+		static const int GAME_HEIGHT = 720;
 		bool isRunning;
 		Uint32 lastFrameTicks; //remembers SDL_GetTicks() value from start of prev frame
 		static const int MIN_FRAME_TIME = 16;
@@ -16,6 +19,8 @@ class Game{
 		Player player;
 		Level level;
 		SDL_Texture* tileTextures[TILE_COUNT]; //if I used a scoped enum (meaning it was also a class), the TC would need Tiles::
+		bool isDebug;
+		int gameWidth;
 	public:
 		bool init();
 		void run();

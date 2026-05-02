@@ -6,7 +6,7 @@ Player::Player()
 	: playerX(0), playerY(0), floorY(0),
 	  velocityX(0), velocityY(0), animTimer(0),
 	  texStand(nullptr), texStep(nullptr), texJump(nullptr),
-	  isFacingLeft(false),
+	  isFacingLeft(false), isHoldingRun(false), isInAir(false),
 	  standW(0), standH(0), stepW(0), stepH(0), jumpW(0), jumpH(0) {}
 
 Player::~Player(){
@@ -14,9 +14,18 @@ Player::~Player(){
 }
 
 void Player::destroyTextures(){
-	if(texStand != nullptr){ SDL_DestroyTexture(texStand); texStand = nullptr; }
-	if(texStep  != nullptr){ SDL_DestroyTexture(texStep);  texStep  = nullptr; }
-	if(texJump  != nullptr){ SDL_DestroyTexture(texJump);  texJump  = nullptr; }
+	if(this->texStand != nullptr){ 
+		SDL_DestroyTexture(this->texStand); 
+		this->texStand = nullptr; 
+	}
+	if(this->texStep  != nullptr){ 
+		SDL_DestroyTexture(this->texStep);
+		this->texStep  = nullptr;
+	}
+	if(this->texJump  != nullptr){ 
+		SDL_DestroyTexture(this->texJump);  
+		this->texJump  = nullptr; 
+	}
 }
 
 bool Player::loadTextures(SDL_Renderer* renderer){
@@ -39,78 +48,79 @@ bool Player::loadTextures(SDL_Renderer* renderer){
 	SDL_SetColorKey(spriteStep,  SDL_TRUE, SDL_MapRGB(spriteStep->format,  0xFF, 0x80, 0xC0));
 	SDL_SetColorKey(spriteJump,  SDL_TRUE, SDL_MapRGB(spriteJump->format,  0xFF, 0x80, 0xC0));
 
-	texStand = SDL_CreateTextureFromSurface(renderer, spriteStand);
-	texStep  = SDL_CreateTextureFromSurface(renderer, spriteStep);
-	texJump  = SDL_CreateTextureFromSurface(renderer, spriteJump);
+	this->texStand = SDL_CreateTextureFromSurface(renderer, spriteStand);
+	this->texStep  = SDL_CreateTextureFromSurface(renderer, spriteStep);
+	this->texJump  = SDL_CreateTextureFromSurface(renderer, spriteJump);
 
 	SDL_FreeSurface(spriteStand);
 	SDL_FreeSurface(spriteStep);
 	SDL_FreeSurface(spriteJump);
 
-	SDL_QueryTexture(texStand, NULL, NULL, &standW, &standH);
-	SDL_QueryTexture(texStep,  NULL, NULL, &stepW,  &stepH);
-	SDL_QueryTexture(texJump,  NULL, NULL, &jumpW,  &jumpH);
+	SDL_QueryTexture(this->texStand, NULL, NULL, &this->standW, &this->standH);
+	SDL_QueryTexture(this->texStep,  NULL, NULL, &this->stepW,  &this->stepH);
+	SDL_QueryTexture(this->texJump,  NULL, NULL, &this->jumpW,  &this->jumpH);
 	return true;
 }
 
 void Player::spawn(float x, float floor){
-	playerX = x;
-	floorY  = floor;
-	playerY = floor;
-	velocityX = 0.f;
-	velocityY = 0.f;
+	this->playerX = x;
+	this->floorY  = floor;
+	this->playerY = floor;
+	this->velocityX = 0.f;
+	this->velocityY = 0.f;
 }
 
-void Player::handleInput(const Uint8* keys){
-	const float speed = 400.f;
-	velocityX = 0.f;
+void Player::handleInput(const Uint8* keys, bool holdingRun){
+	float speed = 300.f;
+	holdingRun = this->isHoldingRun;
+	this->velocityX = 0.f;
 	if (keys[SDL_SCANCODE_LEFT]) {
-		velocityX = -speed;
-		isFacingLeft = true;
+		this->velocityX = -speed;
+		this->isFacingLeft = true;
 	}
 	if (keys[SDL_SCANCODE_RIGHT]) {
-		velocityX = speed;
-		isFacingLeft = false;
+		this->velocityX = speed;
+		this->isFacingLeft = false;
 	}
-	if (keys[SDL_SCANCODE_SPACE] && playerY >= floorY) {
-		velocityY = -400.f;
+	if (keys[SDL_SCANCODE_SPACE] && this->playerY >= this->floorY) {
+		this->velocityY = -350.f;
 	}
 }
 
 void Player::update(float dt, const Level& level){
 	(void)level; // collision against tiles will use this soon
-	velocityY += 800.f * dt;
-	playerX   += velocityX * dt;
-	playerY   += velocityY * dt;
-	if (playerY > floorY) {
-		playerY   = floorY;
-		velocityY = 0.f;
+	this->velocityY += 800.f * dt;
+	this->playerX   += this->velocityX * dt;
+	this->playerY   += this->velocityY * dt;
+	if (this->playerY > this->floorY) {
+		this->playerY   = this->floorY;
+		this->velocityY = 0.f;
 	}
-	if (velocityX != 0.f){
-		animTimer += dt;
+	if (this->velocityX != 0.f){
+		this->animTimer += dt;
 	} else {
-		animTimer = 0.f;
+		this->animTimer = 0.f;
 	}
 }
 
 void Player::render(SDL_Renderer* renderer){
-	SDL_Texture* currentTex = texStand;
-	int drawW = standW;
-	int drawH = standH;
+	SDL_Texture* currentTex = this->texStand;
+	int drawW = this->standW;
+	int drawH = this->standH;
 
-	bool useStepSprite = fmod(animTimer, 0.3f) > 0.15f;
+	bool useStepSprite = fmod(this->animTimer, 0.3f) > 0.15f;
 	if(useStepSprite){
-		currentTex = texStep;
-		drawW = stepW;
-		drawH = stepH;
+		currentTex = this->texStep;
+		drawW = this->stepW;
+		drawH = this->stepH;
 	}
-	if (playerY < floorY) {
-		currentTex = texJump;
-		drawW = jumpW;
-		drawH = jumpH;
+	if (this->playerY < this->floorY) {
+		currentTex = this->texJump;
+		drawW = this->jumpW;
+		drawH = this->jumpH;
 	}
 
-	SDL_Rect dst = { (int)playerX, (int)playerY, drawW, drawH };
-	SDL_RendererFlip flip = isFacingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	SDL_Rect dst = { (int)this->playerX, (int)this->playerY, drawW, drawH };
+	SDL_RendererFlip flip = this->isFacingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 	SDL_RenderCopyEx(renderer, currentTex, NULL, &dst, 0.0, NULL, flip);
 }

@@ -106,3 +106,5 @@ enum Tiles{
 	CHECKERBUSH_TOP_RIGHT = 102,
 	TILE_COUNT = 103
 };
+
+bool isSolid(int tileID);

@@ -11,7 +11,7 @@ class Level{
 		void buildGround(int X, int Y, int gWidth, int gHeight);
 		void buildSteps(int X, int Y, int iSize, bool accOrObt); // true = ACCUTE, false = OBTUSE
 		void placeSingleTileObject(Tiles t, int Xpos, int Ypos);
-		//void buildPipe(int X, int Y, int shaftHeight = 1)
+		int tileAt(int col, int row) const;
 		void placeRectangularShape(const TileMatrix& platfOrCloud, int Xpos, int Ypos);
 		void addItem(Items item, int X, int Y);
 		void level_1_1();

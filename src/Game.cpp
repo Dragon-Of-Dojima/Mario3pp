@@ -4,7 +4,15 @@
 #include <vector>
 #include <cmath>
 
-Game::Game(): window(nullptr), renderer(nullptr), isRunning(false), lastFrameTicks(0){
+Game::Game(): window(nullptr), renderer(nullptr),isRunning(false),lastFrameTicks(0),
+#ifdef MARIO_DEBUG
+	  isDebug(true),
+	  gameWidth(GAME_WIDTH_DEBUG)
+#else
+	  isDebug(false),
+	  gameWidth(GAME_WIDTH_PROD)
+#endif
+{
 	for(int i = 0; i < TILE_COUNT; i++){
 		tileTextures[i] = nullptr;
 	} 
@@ -16,13 +24,15 @@ bool Game::init(){
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
 		return false;
-	}	
+	}
+		
 	this->window = SDL_CreateWindow(
 		"Mario 3++",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		1280, 720,
+		gameWidth, GAME_HEIGHT,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
 	);
+	
 	if (this->window == nullptr) {
 		std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << std::endl;
 		SDL_Quit();
@@ -46,7 +56,7 @@ bool Game::init(){
 		return false;
 	}
 
-	level.level_1_1();
+	this->level.level_1_1();
 
 	static const char* tileFiles[TILE_COUNT] = {};
 	tileFiles[STONE_LEFT]        = "public/images/tiles/mainTileLeftEdge.bmp";
@@ -146,7 +156,7 @@ bool Game::init(){
 	if(!player.loadTextures(this->renderer)){
 		return false;
 	}
-	const float floorY = (720.f - TILE_SIZE) - player.getStandHeight();
+	const float floorY = (GAME_HEIGHT - TILE_SIZE) - player.getStandHeight();
 	player.spawn(48.f, floorY);
 
 	return true;
@@ -191,18 +201,18 @@ void Game::handleEvents(){
 void Game::update(float dt){
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
 	player.handleInput(keys);
-	player.update(dt,level);
+	player.update(dt,this->level);
 }
 void Game::render(){
 	SDL_SetRenderDrawColor(this->renderer, 0xAF, 0xF9, 0xF0, 0xFF);
 	SDL_RenderClear(this->renderer);
 
-	const std::vector<std::vector<int>>& tiles = level.getTiles();
+	const std::vector<std::vector<int>>& tiles = this->level.getTiles();
 	for(int row = 0; row < (int)tiles.size(); row++){
 		for(int col = 0; col < (int)tiles[row].size(); col++){
 			int id = tiles[row][col];
 			if(id == BLUESKY || tileTextures[id] == nullptr) continue;
-			SDL_Rect dst = { col * TILE_SIZE, 720 - TILE_SIZE * (row + 1), TILE_SIZE, TILE_SIZE };
+			SDL_Rect dst = { col * TILE_SIZE, GAME_HEIGHT - TILE_SIZE * (row + 1), TILE_SIZE, TILE_SIZE };
 			SDL_RenderCopy(renderer, tileTextures[id], NULL, &dst);
 		}
 	}
