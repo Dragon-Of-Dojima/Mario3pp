@@ -4,6 +4,7 @@
 #include "Level.h"
 #include "Tiles.h"
 #include "Shapes.h"
+#include "Constants.h"
 #include <algorithm>
 #include <iostream>
 
@@ -58,6 +59,14 @@ int Level::tileAt(int col, int row) const{
 	}
 	std::cout << this->levelTiles[row][col] << std::endl;
 	return this->levelTiles[row][col];
+}
+int Level::colFromX(float screenX)const{
+	return std::floor(screenX / TILE_SIZE);
+}
+int Level::rowFromY(float screenY)const{
+	//int row = (GAME_HEIGHT - screenY) / TILE_SIZE - 1;
+	int row = (GAME_HEIGHT - TILE_SIZE - screenY) / TILE_SIZE;
+	return std::floor(row);
 }
 
 void Level::placeRectangularShape(const TileMatrix& platfOrCloud, int Xpos, int Ypos){
@@ -164,15 +173,36 @@ void Level::level_1_1(){
 	shapes::shadowfy(pinkPlatformInSky,"insky","TRANSPARENT");
 	placeRectangularShape(pinkPlatformInSky,82,14);
 	placeRectangularShape(shapes::bushSetThree,51,2);
-	tileAt(5,9); //0
-	tileAt(0,0); //stoneleft
-	tileAt(25,1);
-	tileAt(30,1);
-	tileAt(0,176);
-	tileAt(2,5);
-	tileAt(46,2);
-	tileAt(51,3);
-	tileAt(44,4); //should be a question block!
+	// tileAt(5,9); //0
+	// tileAt(0,0); //stoneleft
+	// tileAt(25,1);
+	// tileAt(30,1);
+	// tileAt(0,176);
+	// tileAt(2,5);
+	// tileAt(46,2);
+	// tileAt(51,3);
+	// tileAt(44,4); //should be a question block!
+	// int demo1 = this->rowFromY(704.0f);
+	// std::cout << "rowFromY(704)=" << demo1 << " (expect 0)" << std::endl;
+	// int demo2 = this->rowFromY(688.0f);
+	// std::cout << "rowFromY(688)=" << demo2 << " (expect 1)" << std::endl;
+	// int demo3 = this->rowFromY(0.0f);
+	// std::cout << "rowFromY(0)="   << demo3 << " (expect 44)" << std::endl;
+	// int demo4 = this->colFromX(144.0f);
+	// std::cout << "colFromX(144)=" << demo4 << " (expect 9)" << std::endl;
+	// int demo5 = this->rowFromY(720.0f);
+	// std::cout << "rowFromY(720)=" << demo5 << " (expect -1)" << std::endl;
+
+	// int demo6 = this->colFromX(0.0f);
+	// std::cout << "colFromX(0)="    << demo6 << " (expect 0)"   << std::endl;
+	// int demo7 = this->colFromX(15.0f);
+	// std::cout << "colFromX(15)="   << demo7 << " (expect 0)"   << std::endl;
+	// int demo8 = this->colFromX(16.0f);
+	// std::cout << "colFromX(16)="   << demo8 << " (expect 1)"   << std::endl;
+	// int demo9 = this->colFromX(-1.0f);
+	// std::cout << "colFromX(-1)="   << demo9 << " (expect -1)"  << std::endl;
+	// int demo10 = this->colFromX(2816.0f);
+	// std::cout << "colFromX(2816)=" << demo10 << " (expect 176)" << std::endl;
 }
 
 // is identical to structGND but uses different tiles

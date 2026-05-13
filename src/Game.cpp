@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Constants.h"
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include <vector>
@@ -211,8 +212,10 @@ void Game::render(){
 	for(int row = 0; row < (int)tiles.size(); row++){
 		for(int col = 0; col < (int)tiles[row].size(); col++){
 			int id = tiles[row][col];
-			if(id == BLUESKY || tileTextures[id] == nullptr) continue;
-			SDL_Rect dst = { col * TILE_SIZE, GAME_HEIGHT - TILE_SIZE * (row + 1), TILE_SIZE, TILE_SIZE };
+			if(id == BLUESKY || tileTextures[id] == nullptr){
+				continue;
+			}
+			SDL_Rect dst = { col * TILE_SIZE, GAME_HEIGHT - TILE_SIZE * (row + 1), TILE_SIZE, TILE_SIZE }; // second param flips the Y axis direction
 			SDL_RenderCopy(renderer, tileTextures[id], NULL, &dst);
 		}
 	}
