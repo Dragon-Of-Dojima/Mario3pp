@@ -158,7 +158,8 @@ bool Game::init(){
 		return false;
 	}
 	const float floorY = (GAME_HEIGHT - TILE_SIZE) - player.getStandHeight();
-	player.spawn(48.f, floorY);
+	float whereToSpawn = TILE_SIZE * 3.f;
+	player.spawn(whereToSpawn, floorY);
 
 	return true;
 	

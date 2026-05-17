@@ -21,6 +21,7 @@ class Player{
 		bool loadTextures(SDL_Renderer* renderer);
 		void destroyTextures();
 		void spawn(float x, float floorY);
+		SDL_FRect getBounds() const;
 		int getStandHeight() const { return standH; }
 		void handleInput(const Uint8* keys, bool holdingRun = false);
 		void update(float dt, const Level& level);

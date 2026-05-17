@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Constants.h"
 #include <cmath>
 #include <iostream>
 
@@ -62,6 +63,10 @@ bool Player::loadTextures(SDL_Renderer* renderer){
 	return true;
 }
 
+SDL_FRect Player::getBounds() const{
+	return {this->playerX, this->playerY, (float)standW, (float)standH};
+}
+
 void Player::spawn(float x, float floor){
 	this->playerX = x;
 	this->floorY  = floor;
@@ -72,7 +77,7 @@ void Player::spawn(float x, float floor){
 
 void Player::handleInput(const Uint8* keys, bool holdingRun){
 	float speed = 300.f;
-	holdingRun = this->isHoldingRun;
+	this->isHoldingRun = holdingRun;
 	this->velocityX = 0.f;
 	if (keys[SDL_SCANCODE_LEFT]) {
 		this->velocityX = -speed;
@@ -82,20 +87,57 @@ void Player::handleInput(const Uint8* keys, bool holdingRun){
 		this->velocityX = speed;
 		this->isFacingLeft = false;
 	}
-	if (keys[SDL_SCANCODE_SPACE] && this->playerY >= this->floorY) {
+	if (keys[SDL_SCANCODE_SPACE] && !this->isInAir) {
 		this->velocityY = -350.f;
 	}
 }
 
 void Player::update(float dt, const Level& level){
-	(void)level; // collision against tiles will use this soon
 	this->velocityY += 800.f * dt;
-	this->playerX   += this->velocityX * dt;
-	this->playerY   += this->velocityY * dt;
-	if (this->playerY > this->floorY) {
-		this->playerY   = this->floorY;
-		this->velocityY = 0.f;
+	this->isInAir = true;
+
+
+	// bool isTileUnderSolid = isSolid(level.tileAt(colOfPlayer,rowOfPlayer - 1));
+	// bool isTileNextToSolid = isSolid(level.tileAt(colOfPlayer + 1,rowOfPlayer));
+	
+	this->playerX += this->velocityX * dt;
+	this->playerY += velocityY * dt;
+	SDL_FRect theBounds = this->getBounds();
+	float topEdge = theBounds.y;
+	float bottomEdge = theBounds.y + theBounds.h;
+	float leftEdge = theBounds.x;
+	float rightEdge = theBounds.x + theBounds.w;
+
+	int lowRow = level.rowFromY(bottomEdge - 1); //low (physically high) on screen
+	int highRow = level.rowFromY(topEdge); //high (physically low) on screen
+	int leftCol = level.colFromX(leftEdge);
+	int rightCol = level.colFromX(rightEdge - 1);
+	for (int c = leftCol; c <= rightCol; c++){
+		for(int r = highRow; r <= lowRow; r++){
+			if(isSolid(level.tileAt(c,r))){
+				if(this->velocityY > 0){
+					this->playerY = (GAME_HEIGHT - TILE_SIZE * (r + 1)) - theBounds.h;
+					this->isInAir = false;
+					this->velocityY = 0;
+				}
+				else if(this->velocityY < 0){
+					this->playerY = GAME_HEIGHT - TILE_SIZE * r;
+					
+					this->velocityY = 0;
+				}
+				
+				break;
+			}
+		}
 	}
+	for (int c = leftCol; c <= rightCol; c++){
+		for(int r = highRow; r <= lowRow; r++){
+
+		}
+	}
+
+
+
 	if (this->velocityX != 0.f){
 		this->animTimer += dt;
 	} else {
@@ -114,13 +156,27 @@ void Player::render(SDL_Renderer* renderer){
 		drawW = this->stepW;
 		drawH = this->stepH;
 	}
-	if (this->playerY < this->floorY) {
+	if (this->isInAir) {
 		currentTex = this->texJump;
 		drawW = this->jumpW;
 		drawH = this->jumpH;
 	}
 
-	SDL_Rect dst = { (int)this->playerX, (int)this->playerY, drawW, drawH };
+	//SDL_Rect dst = { (int)this->playerX, (int)this->playerY, drawW, drawH };
+	SDL_FRect bounds = this->getBounds();
+	std::cout << "bounds after spawn: x=" << bounds.x << " y=" << bounds.y << " w=" << bounds.w << " h=" << bounds.h << std::endl;
+	SDL_Rect dst = { (int)bounds.x, (int)bounds.y, drawW, drawH }; //dst = destination rectangle
 	SDL_RendererFlip flip = this->isFacingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 	SDL_RenderCopyEx(renderer, currentTex, NULL, &dst, 0.0, NULL, flip);
+	/*
+	int SDL_RenderCopyEx(
+		SDL_Renderer* renderer,
+		SDL_Texture* texture,
+		const SDL_Rect* srcrect,     // source rectangle: what part of the texture to copy
+		const SDL_Rect* dstrect,     // destination rectangle: where on screen to put it
+		double angle,
+		const SDL_Point* center,
+		SDL_RendererFlip flip
+	);
+	*/ 
 }
