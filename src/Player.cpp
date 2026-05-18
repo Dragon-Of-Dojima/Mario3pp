@@ -94,49 +94,86 @@ void Player::handleInput(const Uint8* keys, bool holdingRun){
 
 void Player::update(float dt, const Level& level){
 	this->velocityY += 800.f * dt;
-	this->isInAir = true;
 
+	// Resolve X and Y separately. If we move both at once and resolve Y first, a side wall
+	// the player just pushed into looks like a ceiling/floor to the Y resolver, which would
+	// snap the player vertically through level geometry.
 
-	// bool isTileUnderSolid = isSolid(level.tileAt(colOfPlayer,rowOfPlayer - 1));
-	// bool isTileNextToSolid = isSolid(level.tileAt(colOfPlayer + 1,rowOfPlayer));
-	
+	// ---- X axis ----
 	this->playerX += this->velocityX * dt;
-	this->playerY += velocityY * dt;
-	SDL_FRect theBounds = this->getBounds();
-	float topEdge = theBounds.y;
-	float bottomEdge = theBounds.y + theBounds.h;
-	float leftEdge = theBounds.x;
-	float rightEdge = theBounds.x + theBounds.w;
-
-	int lowRow = level.rowFromY(bottomEdge - 1); //low (physically high) on screen
-	int highRow = level.rowFromY(topEdge); //high (physically low) on screen
-	int leftCol = level.colFromX(leftEdge);
-	int rightCol = level.colFromX(rightEdge - 1);
-	for (int c = leftCol; c <= rightCol; c++){
-		for(int r = highRow; r <= lowRow; r++){
-			if(isSolid(level.tileAt(c,r))){
-				if(this->velocityY > 0){
-					this->playerY = (GAME_HEIGHT - TILE_SIZE * (r + 1)) - theBounds.h;
-					this->isInAir = false;
-					this->velocityY = 0;
-				}
-				else if(this->velocityY < 0){
-					this->playerY = GAME_HEIGHT - TILE_SIZE * r;
-					
-					this->velocityY = 0;
-				}
-				
+	if (this->velocityX != 0.f) {
+		SDL_FRect b = this->getBounds();
+		float topX    = b.y;
+		float botX    = b.y + b.h;
+		float leftX   = b.x;
+		float rightX  = b.x + b.w;
+		// Use bot-1 so a player resting on a tile boundary doesn't treat that tile as a side wall.
+		int bottomRowX = level.rowFromY(botX - 1);
+		int topRowX    = level.rowFromY(topX);
+		int probeCol;
+		float resolvedX;
+		if (this->velocityX > 0) {
+			probeCol  = level.colFromX(rightX + 1);
+			resolvedX = (probeCol * (float)TILE_SIZE) - b.w;
+		} else {
+			probeCol  = level.colFromX(leftX);
+			resolvedX = (probeCol + 1) * (float)TILE_SIZE;
+		}
+		for (int r = bottomRowX; r <= topRowX; r++) {
+			if (isSolid(level.tileAt(probeCol, r))) {
+				this->playerX = resolvedX;
+				this->velocityX = 0;
 				break;
 			}
 		}
 	}
-	for (int c = leftCol; c <= rightCol; c++){
-		for(int r = highRow; r <= lowRow; r++){
 
+	// ---- Y axis ----
+	this->playerY += this->velocityY * dt;
+	{
+		SDL_FRect b = this->getBounds();
+		float topY    = b.y;
+		float botY    = b.y + b.h;
+		float leftY   = b.x;
+		float rightY  = b.x + b.w;
+		// Probe botY (no -1) so we land on a tile exactly when bottomEdge == tile top.
+		int bottomRowY = level.rowFromY(botY);
+		int topRowY    = level.rowFromY(topY);
+		int leftColY   = level.colFromX(leftY);
+		int rightColY  = level.colFromX(rightY - 1);
+
+		for (int c = leftColY; c <= rightColY; c++){
+			for (int r = bottomRowY; r <= topRowY; r++){
+				if (isSolid(level.tileAt(c, r))){
+					if (this->velocityY > 0){
+						this->playerY = (GAME_HEIGHT - TILE_SIZE * (r + 1)) - b.h;
+						this->velocityY = 0;
+					}
+					else if (this->velocityY < 0){
+						this->playerY = GAME_HEIGHT - TILE_SIZE * r;
+						this->velocityY = 0;
+					}
+					break;
+				}
+			}
 		}
 	}
 
 
+	// "Grounded" check: probe the row directly below the player's feet so isInAir stays
+	// false while resting on a tile (gravity-induced overshoot resolution alone is too jittery).
+	SDL_FRect finalBounds = this->getBounds();
+	int rowBelow = level.rowFromY(finalBounds.y + finalBounds.h);
+	int feetLeftCol  = level.colFromX(finalBounds.x);
+	int feetRightCol = level.colFromX(finalBounds.x + finalBounds.w - 1);
+	bool grounded = false;
+	for (int c = feetLeftCol; c <= feetRightCol; c++){
+		if (isSolid(level.tileAt(c, rowBelow))){
+			grounded = true;
+			break;
+		}
+	}
+	this->isInAir = !grounded;
 
 	if (this->velocityX != 0.f){
 		this->animTimer += dt;

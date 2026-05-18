@@ -64,9 +64,9 @@ int Level::colFromX(float screenX)const{
 	return std::floor(screenX / TILE_SIZE);
 }
 int Level::rowFromY(float screenY)const{
-	//int row = (GAME_HEIGHT - screenY) / TILE_SIZE - 1;
-	int row = (GAME_HEIGHT - TILE_SIZE - screenY) / TILE_SIZE;
-	return std::floor(row);
+	// Row r spans screen Y in [GAME_HEIGHT - TILE_SIZE*(r+1), GAME_HEIGHT - TILE_SIZE*r).
+	// So r is the largest int with TILE_SIZE*r < GAME_HEIGHT - screenY, i.e. ceil(A/TS) - 1.
+	return (int)std::ceil((GAME_HEIGHT - screenY) / (float)TILE_SIZE) - 1;
 }
 
 void Level::placeRectangularShape(const TileMatrix& platfOrCloud, int Xpos, int Ypos){
